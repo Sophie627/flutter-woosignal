@@ -23,6 +23,7 @@ import 'package:woosignal/models/response/shipping_method.dart';
 import 'package:label_storemax/app_country_options.dart';
 
 class CheckoutShippingTypePage extends StatefulWidget {
+  
   CheckoutShippingTypePage();
 
   @override
@@ -32,11 +33,23 @@ class CheckoutShippingTypePage extends StatefulWidget {
 
 class _CheckoutShippingTypePageState extends State<CheckoutShippingTypePage> {
   _CheckoutShippingTypePageState();
-
   bool _isShippingSupported;
   bool _isLoading;
   List<Map<String, dynamic>> _wsShippingOptions;
   WSShipping _shipping;
+  bool _isFree = true;
+
+  void _getIsFree() async {
+    Cart.getInstance.getSubtotal(withFormat: true).then((String result) {
+      double subtotal = double.parse(result.substring(2));
+      print('subtotal: ${subtotal}');
+      if (subtotal < 650) {
+        setState(() {
+          _isFree = false;
+        });
+      }
+    });
+  }
 
   @override
   void initState() {
@@ -47,6 +60,7 @@ class _CheckoutShippingTypePageState extends State<CheckoutShippingTypePage> {
 
     _isLoading = true;
     _getShippingMethods();
+    _getIsFree();
   }
 
 //POR AQUI DEBO ENVIAR SOLO LO Q NECESITA PARA QUE NO SE CONFUNDA EL TIPO DE SHIPPING Y QUE ME MUESTRE 2 OPCIONES
@@ -207,6 +221,7 @@ class _CheckoutShippingTypePageState extends State<CheckoutShippingTypePage> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       resizeToAvoidBottomPadding: false,
       appBar: AppBar(
@@ -250,100 +265,116 @@ class _CheckoutShippingTypePageState extends State<CheckoutShippingTypePage> {
                             : (_isShippingSupported
                                 ? Expanded(
                                     child: ListView.separated(
-                                      itemCount: _wsShippingOptions.length,
+                                      itemCount: _wsShippingOptions.length + 1,
                                       separatorBuilder: (context, index) =>
                                           Divider(
                                         color: Colors.black12,
                                       ),
                                       itemBuilder:
                                           (BuildContext context, int index) {
-                                        return ListTile(
-                                          contentPadding: EdgeInsets.only(
-                                              left: 16, right: 16),
-                                          title: Text(
-                                            _wsShippingOptions[index]['title'],
-                                            style: Theme.of(context)
-                                                .primaryTextTheme
-                                                .subtitle1,
-                                          ),
-                                          selected: true,
-                                          subtitle: FutureBuilder<String>(
-                                            future: _getShippingPrice(index),
-                                            builder: (BuildContext context,
-                                                AsyncSnapshot<String>
-                                                    snapshot) {
-                                              switch (
-                                                  snapshot.connectionState) {
-                                                case ConnectionState.none:
-                                                  return Text('');
-                                                case ConnectionState.active:
-                                                case ConnectionState.waiting:
-                                                  return Text('');
-                                                case ConnectionState.done:
-                                                  if (snapshot.hasError)
+                                        if (index == _wsShippingOptions.length) {
+                                          return ListTile(
+                                            contentPadding: EdgeInsets.only(left: 16, right: 16),
+                                            title: Text('Flexible Shipping',
+                                              style: Theme.of(context).primaryTextTheme.subtitle1,
+                                            ),
+                                            selected: true,
+                                            subtitle: Text(_isFree ? 'Price: L 0.00' : 'Price: L 70.00',
+                                              style: TextStyle(
+                                                color: Colors.blueAccent[700],
+                                                fontSize: 14.5
+                                              ),
+                                            ),
+                                          );
+                                        } else {
+                                          return ListTile(
+                                            contentPadding: EdgeInsets.only(
+                                                left: 16, right: 16),
+                                            title: Text(
+                                              _wsShippingOptions[index]['title'],
+                                              style: Theme.of(context)
+                                                  .primaryTextTheme
+                                                  .subtitle1,
+                                            ),
+                                            selected: true,
+                                            subtitle: FutureBuilder<String>(
+                                              future: _getShippingPrice(index),
+                                              builder: (BuildContext context,
+                                                  AsyncSnapshot<String>
+                                                  snapshot) {
+                                                switch (
+                                                snapshot.connectionState) {
+                                                  case ConnectionState.none:
                                                     return Text('');
-                                                  return RichText(
-                                                      text: TextSpan(
-                                                    text: '',
-                                                    style: DefaultTextStyle.of(
-                                                            context)
-                                                        .style,
-                                                    children: <TextSpan>[
-                                                      (_wsShippingOptions[index]
-                                                                  ["object"]
-                                                              is FreeShipping
-                                                          ? TextSpan(
-                                                              text:
-                                                                  "Free postage")
-                                                          : TextSpan(
+                                                  case ConnectionState.active:
+                                                  case ConnectionState.waiting:
+                                                    return Text('');
+                                                  case ConnectionState.done:
+                                                    if (snapshot.hasError)
+                                                      return Text('');
+                                                    return RichText(
+                                                        text: TextSpan(
+                                                          text: '',
+                                                          style: DefaultTextStyle.of(
+                                                              context)
+                                                              .style,
+                                                          children: <TextSpan>[
+                                                            (_wsShippingOptions[index]
+                                                            ["object"]
+                                                            is FreeShipping
+                                                                ? TextSpan(
+                                                                text:
+                                                                "Free postage")
+                                                                : TextSpan(
                                                               text: trans(
-                                                                      context,
-                                                                      "Price") +
+                                                                  context,
+                                                                  "Price") +
                                                                   ": " +
                                                                   formatStringCurrency(
                                                                       total: snapshot
                                                                           .data),
                                                             )),
-                                                      _wsShippingOptions[index][
-                                                                  "min_amount"] !=
-                                                              null
-                                                          ? TextSpan(
-                                                              text: "\nSpend a minimum of " +
-                                                                  formatStringCurrency(
-                                                                      total: _wsShippingOptions[
-                                                                              index]
-                                                                          [
-                                                                          "min_amount"]),
-                                                              style: Theme.of(
-                                                                      context)
-                                                                  .primaryTextTheme
-                                                                  .bodyText2
-                                                                  .copyWith(
-                                                                      fontSize:
-                                                                          14))
-                                                          : null,
-                                                    ]
-                                                        .where((e) => e != null)
-                                                        .toList(),
-                                                  ));
-                                              }
-                                              return null;
-                                            },
-                                          ),
-                                          trailing: (CheckoutSession.getInstance
-                                                          .shippingType !=
-                                                      null &&
-                                                  CheckoutSession
-                                                          .getInstance
-                                                          .shippingType
-                                                          .object ==
-                                                      _wsShippingOptions[index]
-                                                          ["object"]
-                                              ? Icon(Icons.check)
-                                              : null),
-                                          onTap: () =>
-                                              _handleCheckoutTapped(index),
-                                        );
+                                                            _wsShippingOptions[index][
+                                                            "min_amount"] !=
+                                                                null
+                                                                ? TextSpan(
+                                                                text: "\nSpend a minimum of " +
+                                                                    formatStringCurrency(
+                                                                        total: _wsShippingOptions[
+                                                                        index]
+                                                                        [
+                                                                        "min_amount"]),
+                                                                style: Theme.of(
+                                                                    context)
+                                                                    .primaryTextTheme
+                                                                    .bodyText2
+                                                                    .copyWith(
+                                                                    fontSize:
+                                                                    14))
+                                                                : null,
+                                                          ]
+                                                              .where((e) => e != null)
+                                                              .toList(),
+                                                        ));
+                                                }
+                                                return null;
+                                              },
+                                            ),
+                                            trailing: (CheckoutSession.getInstance
+                                                .shippingType !=
+                                                null &&
+                                                CheckoutSession
+                                                    .getInstance
+                                                    .shippingType
+                                                    .object ==
+                                                    _wsShippingOptions[index]
+                                                    ["object"]
+                                                ? Icon(Icons.check)
+                                                : null),
+                                            onTap: () =>
+                                                _handleCheckoutTapped(index),
+                                          );
+                                        }
                                       },
                                     ),
                                   )
