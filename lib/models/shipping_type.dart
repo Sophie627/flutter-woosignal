@@ -45,6 +45,8 @@ class ShippingType {
           return (withFormatting == true
               ? formatStringCurrency(total: cost)
               : localPickup.cost);
+        case "flexible":
+          return formatStringCurrency(total: cost);
         default:
           return "0";
           break;
@@ -65,6 +67,8 @@ class ShippingType {
         case "local_pickup":
           LocalPickup localPickup = (this.object as LocalPickup);
           return localPickup.title;
+        case "flexible":
+          return "Flexible Shipping";
         default:
           return "";
           break;

@@ -285,6 +285,7 @@ class _CheckoutShippingTypePageState extends State<CheckoutShippingTypePage> {
                                                 fontSize: 14.5
                                               ),
                                             ),
+                                            onTap: _handleFlexibleShippingTapped,
                                           );
                                         } else {
                                           return ListTile(
@@ -407,6 +408,20 @@ class _CheckoutShippingTypePageState extends State<CheckoutShippingTypePage> {
         ),
       ),
     );
+  }
+
+  _handleFlexibleShippingTapped() async {
+    ShippingType shippingType = ShippingType();
+    shippingType.object = 'flexible';
+    shippingType.methodId = 'flexible';
+//    if (_wsShippingOptions[index]['min_amount'] != null) {
+//      shippingType.minimumValue = _wsShippingOptions[index]['min_amount'];
+//    }
+    shippingType.cost = _isFree ? '0.0' : '70.0';
+
+    CheckoutSession.getInstance.shippingType = shippingType;
+
+    Navigator.pop(context);
   }
 
   _handleCheckoutTapped(int index) async {

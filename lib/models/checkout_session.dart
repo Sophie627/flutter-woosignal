@@ -106,6 +106,9 @@ class CheckoutSession {
         case "local_pickup":
           totalShipping = parseWcPrice(shippingType.cost);
           break;
+        case "flexible":
+          totalShipping = parseWcPrice(shippingType.cost);
+          break;
         default:
           break;
       }
