@@ -219,7 +219,9 @@ class CheckoutConfirmationPageState extends State<CheckoutConfirmationPage> {
                                           .hasMissingFields()
                                       ? trans(
                                           context, "Billing address is incomplete")
-                                      : CheckoutSession.getInstance
+                                      : CheckoutSession.getInstance.shipToDifferentAddress
+                                        ? CheckoutSession.getInstance.billingDetails.shippingAddress.addressFull()
+                                        : CheckoutSession.getInstance
                                           .billingDetails.billingAddress
                                           .addressFull()),
                                   action: _actionCheckoutDetails,

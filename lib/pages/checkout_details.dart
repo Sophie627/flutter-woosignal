@@ -16,6 +16,7 @@ import 'package:label_storemax/helpers/tools.dart';
 import 'package:label_storemax/models/billing_details.dart';
 import 'package:label_storemax/models/checkout_session.dart';
 import 'package:label_storemax/models/customer_address.dart';
+import 'package:label_storemax/widgets/app_loader.dart';
 import 'package:label_storemax/widgets/buttons.dart';
 import 'package:label_storemax/widgets/woosignal_ui.dart';
 import 'package:label_storemax/app_country_options.dart';
@@ -34,9 +35,10 @@ class _CheckoutDetailsPageState extends State<CheckoutDetailsPage> {
 
   bool _valDifferentShippingAddress = false;
   bool _isAddAddress = false;
+  bool _isLoading = true;
   int activeTabIndex = 0;
   String newAddress;
-  List addresses;
+  List addresses = [];
   String tab;
 
   // BILLING TEXT CONTROLLERS
@@ -214,6 +216,38 @@ class _CheckoutDetailsPageState extends State<CheckoutDetailsPage> {
     );
   }
 
+  Widget selectShippingAddresses() {
+    List<Widget> shippingList = [];
+    print('addresses: ${addresses}');
+    if (addresses[0] == 'no Address') {
+      return Center(
+        child: Text('No Shipping Address',
+          style: Theme.of(context).primaryTextTheme.bodyText2,
+        ),
+      );
+    }
+    for (var i = 0; i < addresses.length; i++) {
+      shippingList.add(
+        ListTile(
+          title:  Text('Shipping ' + (i + 1).toString(),
+            style: Theme.of(context).primaryTextTheme.bodyText1,
+          ),
+          subtitle: Text(addresses[i],
+            style: Theme.of(context).primaryTextTheme.subtitle1,
+          ),
+          onTap: () {
+            CheckoutSession.getInstance.billingDetails.shippingAddress.addressLine = addresses[i];
+            CheckoutSession.getInstance.shipToDifferentAddress = true;
+            Navigator.pop(context);
+          },
+        ),
+      );
+    }
+    return ListView(
+      children: shippingList,
+    );
+  }
+
   Widget selectAddresses() {
     BillingDetails billingDetails = CheckoutSession.getInstance.billingDetails;
     String billingAddress = 'Select Billing Address';
@@ -230,29 +264,34 @@ class _CheckoutDetailsPageState extends State<CheckoutDetailsPage> {
             SizedBox(
               height: 40.0,
             ),
-            Text('Billing Address: ' + billingAddress,
-              style: Theme.of(context).primaryTextTheme.bodyText2,
+            ListTile(
+              title:  Text('Billing Address',
+                style: Theme.of(context).primaryTextTheme.bodyText1,
+              ),
+              subtitle: Text(billingAddress,
+                style: Theme.of(context).primaryTextTheme.subtitle1,
+              ),
+              onTap: () {
+                billingDetails.billingAddress.addressLine = billingAddress;
+                CheckoutSession.getInstance.shipToDifferentAddress = false;
+                Navigator.pop(context);
+              },
             ),
             SizedBox(
-              height: 40.0,
+              height: 20.0,
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20.0),
+              child: Divider(
+                thickness: 2,
+                color: Colors.grey[200],
+              ),
+            ),
+            SizedBox(
+              height: 20.0,
             ),
             Expanded(
-                child: ListView(
-                  children: [
-                    Text('Shipping 1: Test Shipping Address 1',
-                      style: Theme.of(context).primaryTextTheme.bodyText2,
-                    ),
-                    SizedBox(
-                      height: 5.0,
-                    ),
-                    Text('Shipping 2: Test Shipping Address 2',
-                      style: Theme.of(context).primaryTextTheme.bodyText2,
-                    ),
-                    SizedBox(
-                      height: 40.0,
-                    ),
-                  ],
-                ),
+                child: selectShippingAddresses(),
             ),
             Container(
               height: 50.0,
@@ -272,6 +311,7 @@ class _CheckoutDetailsPageState extends State<CheckoutDetailsPage> {
                 ),
               ),
             ),
+            SizedBox(height: 20.0,),
           ],
         ),
       ),
@@ -283,7 +323,12 @@ class _CheckoutDetailsPageState extends State<CheckoutDetailsPage> {
     super.initState();
 
     newAddress = '';
-    _getAddresses().then((value) => addresses = value);
+    _getAddresses().then((value) {
+      addresses = value;
+      setState(() {
+        _isLoading = false;
+      });
+    });
     tab = 'billing';
 
     // SHIPPING
@@ -619,7 +664,9 @@ class _CheckoutDetailsPageState extends State<CheckoutDetailsPage> {
           ),
         ),
       )
-      : selectAddresses(),
+      : _isLoading
+        ? showAppLoader()
+        : selectAddresses(),
     );
   }
 
