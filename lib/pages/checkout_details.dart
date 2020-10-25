@@ -33,6 +33,7 @@ class _CheckoutDetailsPageState extends State<CheckoutDetailsPage> {
   _CheckoutDetailsPageState();
 
   bool _valDifferentShippingAddress = false;
+  bool _isAddAddress = false;
   int activeTabIndex = 0;
   String newAddress;
   List addresses;
@@ -325,6 +326,59 @@ class _CheckoutDetailsPageState extends State<CheckoutDetailsPage> {
     );
   }
 
+  Widget selectAddresses() {
+    return Center(
+      child: Container(
+        child: Column(
+          children: [
+            Text('Select Address',
+              style: Theme.of(context).primaryTextTheme.headline6,
+            ),
+            SizedBox(
+              height: 40.0,
+            ),
+            Text('Billing Address: Test Billing Address',
+              style: Theme.of(context).primaryTextTheme.bodyText2,
+            ),
+            SizedBox(
+              height: 40.0,
+            ),
+            Text('Shipping 1: Test Shipping Address 1',
+              style: Theme.of(context).primaryTextTheme.bodyText2,
+            ),
+            SizedBox(
+              height: 5.0,
+            ),
+            Text('Shipping 2: Test Shipping Address 2',
+              style: Theme.of(context).primaryTextTheme.bodyText2,
+            ),
+            SizedBox(
+              height: 40.0,
+            ),
+            Container(
+              height: 50.0,
+              padding: EdgeInsets.symmetric(horizontal: 30.0),
+              child: RaisedButton(
+                onPressed: () {
+                  setState(() {
+                    _isAddAddress = true;
+                  });
+                },
+                child: Text('Add an Address',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -513,7 +567,8 @@ class _CheckoutDetailsPageState extends State<CheckoutDetailsPage> {
         ),
         centerTitle: true,
       ),
-      body: SafeArea(
+      body: _isAddAddress
+      ? SafeArea(
         minimum: safeAreaDefault(),
         child: GestureDetector(
           onTap: () => FocusScope.of(context).requestFocus(new FocusNode()),
@@ -665,7 +720,8 @@ class _CheckoutDetailsPageState extends State<CheckoutDetailsPage> {
             ),
           ),
         ),
-      ),
+      )
+      : selectAddresses(),
     );
   }
 
