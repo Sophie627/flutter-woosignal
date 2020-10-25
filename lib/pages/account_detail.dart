@@ -67,18 +67,19 @@ class _AccountDetailPageState extends State<AccountDetailPage>
 
   _fetchWpUserData() async {
     String userToken = await readAuthToken();
+    print('token: ${userToken}');
 
     WCCustomerInfoResponse wcCustomerInfoResponse;
     try {
       wcCustomerInfoResponse = await WPJsonAPI.instance
           .api((request) => request.wcCustomerInfo(userToken));
     } on Exception catch (_) {
-      showEdgeAlertWith(
-        context,
-        title: trans(context, "Oops!"),
-        desc: trans(context, "Something went wrong"),
-        style: EdgeAlertStyle.DANGER,
-      );
+//      showEdgeAlertWith(
+//        context,
+//        title: trans(context, "Oops!"),
+//        desc: trans(context, "Something went wrong"),
+//        style: EdgeAlertStyle.DANGER,
+//      );
     } finally {
       setState(() {
         _isLoading = false;
@@ -95,6 +96,7 @@ class _AccountDetailPageState extends State<AccountDetailPage>
 
   @override
   Widget build(BuildContext context) {
+//    print('avatar: ${_wcCustomerInfoResponse}');
     _tabs = [
       new Tab(text: trans(context, "Orders")),
       new Tab(text: trans(context, "Settings")),
@@ -139,7 +141,7 @@ class _AccountDetailPageState extends State<AccountDetailPage>
                                 backgroundImage: NetworkImage(
                                   _wcCustomerInfoResponse != null
                                       ? _wcCustomerInfoResponse.data.avatar
-                                      : "",
+                                      : "http://www.gravatar.com/avatar",
                                 ),
                               ),
                               height: 90,
@@ -278,6 +280,8 @@ class _AccountDetailPageState extends State<AccountDetailPage>
   _fetchOrders() async {
     String userId = await readUserId();
 
+    print('userID: ${userId}');
+
     if (userId == null || _shouldStopRequests == true) {
       setState(() {
         _isLoadingOrders = false;
@@ -290,8 +294,11 @@ class _AccountDetailPageState extends State<AccountDetailPage>
         api.getOrders(customer: int.parse(userId), page: _page, perPage: 50));
 
     if (orders.length <= 0) {
+      print('length: 0');
       setState(() {
         _shouldStopRequests = true;
+        _isLoadingOrders = false;
+        _activeBody = _widgetOrders();
       });
       return;
     }
@@ -305,6 +312,7 @@ class _AccountDetailPageState extends State<AccountDetailPage>
   }
 
   Widget _widgetOrders() {
+    print('_isLoadingOrders: ${_isLoadingOrders}');
     return _isLoadingOrders
         ? showAppLoader()
         : SmartRefresher(
