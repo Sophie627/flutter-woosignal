@@ -214,119 +214,12 @@ class _CheckoutDetailsPageState extends State<CheckoutDetailsPage> {
     );
   }
 
-  Widget selectAddress() {
-    return Flexible(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget>[
-          SizedBox(
-            height: 20.0,
-          ),
-          Text(
-            "Select Address",
-            style: TextStyle(
-              fontSize: 20.0,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          ListTile(
-            title: TextField(
-              decoration: InputDecoration(
-                hintText: 'Address',
-                border: new UnderlineInputBorder(
-                  borderSide: new BorderSide(color: Colors.black),
-                ),
-              ),
-              onChanged: (value) {
-                setState(() {
-                  newAddress = value;
-                });
-              },
-            ),
-            trailing: Container(
-              width: 130.0,
-              height: 40.0,
-              child: RaisedButton(
-                child: Text(
-                  'Add',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 17.0,
-                  ),
-                ),
-                onPressed: _saveAddresses,
-              ),
-            ),
-          ),
-          FutureBuilder<String>(
-            future: _getAddresses(),
-            builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-              if (!snapshot.hasData) {
-                return Text('No Address');
-              } else {
-                if (snapshot.data == 'no Address') {
-                  return Text('No Address');
-                } else {
-                  var addresses = jsonDecode(snapshot.data);
-                  return Flexible(
-                    child: ListView.builder(
-                        itemCount: addresses.length,
-                        itemBuilder: (context, index) {
-                          return Padding(
-                              padding: EdgeInsets.only(bottom: 5.0),
-                              child: Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(15.0),
-                                    color: Colors.grey[300],
-                                  ),
-                                  height: 40.0,
-                                  // color: Colors.blueAccent,
-                                  child: Row(
-                                    mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Expanded(
-                                        child: Center(
-                                          child: Text(
-                                            addresses[index],
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(fontSize: 17.0),
-                                          ),
-                                        ),
-                                      ),
-                                      Padding(
-                                          padding: EdgeInsets.only(right: 10.0),
-                                          child: GestureDetector(
-                                            child: Icon(
-                                              Icons.publish,
-                                              color: Colors.blue,
-                                            ),
-                                            onTap: () => _publishAddress(index),
-                                          )),
-                                      Padding(
-                                          padding: EdgeInsets.only(right: 15.0),
-                                          child: GestureDetector(
-                                            child: Icon(
-                                              Icons.delete,
-                                              color: Colors.red,
-                                            ),
-                                            onTap: () => _removeAddress(index),
-                                          ))
-                                    ],
-                                  )));
-                        }),
-                  );
-                }
-              }
-            },
-          )
-        ],
-      ),
-    );
-  }
-
   Widget selectAddresses() {
+    BillingDetails billingDetails = CheckoutSession.getInstance.billingDetails;
+    String billingAddress = 'Select Billing Address';
+//    print('address: ${billingDetails.billingAddress.addressLine == ''}');
+    if (billingDetails.billingAddress.addressLine != '') billingAddress = billingDetails.billingAddress.addressLine;
+
     return Center(
       child: Container(
         child: Column(
@@ -337,23 +230,29 @@ class _CheckoutDetailsPageState extends State<CheckoutDetailsPage> {
             SizedBox(
               height: 40.0,
             ),
-            Text('Billing Address: Test Billing Address',
+            Text('Billing Address: ' + billingAddress,
               style: Theme.of(context).primaryTextTheme.bodyText2,
             ),
             SizedBox(
               height: 40.0,
             ),
-            Text('Shipping 1: Test Shipping Address 1',
-              style: Theme.of(context).primaryTextTheme.bodyText2,
-            ),
-            SizedBox(
-              height: 5.0,
-            ),
-            Text('Shipping 2: Test Shipping Address 2',
-              style: Theme.of(context).primaryTextTheme.bodyText2,
-            ),
-            SizedBox(
-              height: 40.0,
+            Expanded(
+                child: ListView(
+                  children: [
+                    Text('Shipping 1: Test Shipping Address 1',
+                      style: Theme.of(context).primaryTextTheme.bodyText2,
+                    ),
+                    SizedBox(
+                      height: 5.0,
+                    ),
+                    Text('Shipping 2: Test Shipping Address 2',
+                      style: Theme.of(context).primaryTextTheme.bodyText2,
+                    ),
+                    SizedBox(
+                      height: 40.0,
+                    ),
+                  ],
+                ),
             ),
             Container(
               height: 50.0,
@@ -384,7 +283,7 @@ class _CheckoutDetailsPageState extends State<CheckoutDetailsPage> {
     super.initState();
 
     newAddress = '';
-    _getAddresses().then((value) => addresses = jsonDecode(value));
+    _getAddresses().then((value) => addresses = value);
     tab = 'billing';
 
     // SHIPPING
@@ -676,7 +575,6 @@ class _CheckoutDetailsPageState extends State<CheckoutDetailsPage> {
                   ),
                   height: (constraints.maxHeight - constraints.minHeight) * 0.4,
                 ),
-                selectAddress(),
                 Column(
                   children: <Widget>[
                     Row(
@@ -756,34 +654,34 @@ class _CheckoutDetailsPageState extends State<CheckoutDetailsPage> {
 
   _saveAddresses() async {
     final prefs = await SharedPreferences.getInstance();
-    var address = newAddress;
+    String address = newAddress;
+    List<String> listShippingAddress = [];
+
     var key =
         ((global.base_url == 'https://presstofoods.com/dev/') ? 'SAP' : 'TGU') +
             '_address';
-    _getAddresses().then((String value) {
-      if (value != "no Address") {
-        addresses = jsonDecode(value);
-        setState(() {
-          addresses = addresses;
-        });
-      }
-      if (!addresses.contains(address)) {
-        print(addresses);
-        print(address);
-        addresses.add(address);
-        var value = jsonEncode(addresses);
-        prefs.setString(key, value);
+    _getAddresses().then((value) async {
+      print('Address: ${value}');
+      if (value[0] == 'no Address') {
+        listShippingAddress.add(address);
+        return await prefs.setStringList(key, listShippingAddress);
+      } else {
+        if (value.indexOf(address) == -1) {
+          value.add(address);
+          listShippingAddress = value;
+          return await prefs.setStringList(key, listShippingAddress);
+        }
       }
     });
   }
 
-  static Future<String> _getAddresses() async {
+  static Future<List<String>> _getAddresses() async {
     var key =
         ((global.base_url == 'https://presstofoods.com/dev/') ? 'SAP' : 'TGU') +
             '_address';
     final prefs = await SharedPreferences.getInstance();
-    final addressJson = prefs.getString(key) ?? 'no Address';
-    return addressJson;
+    final addressList = prefs.getStringList(key) ?? ['no Address'];
+    return addressList;
   }
 
   _useDetailsTapped() {
@@ -815,6 +713,7 @@ class _CheckoutDetailsPageState extends State<CheckoutDetailsPage> {
       customerShippingAddress.firstName = _txtBillingFirstName.text;
       customerShippingAddress.lastName = _txtBillingLastName.text;
       customerShippingAddress.addressLine = _txtShippingAddressLine.text;
+      newAddress = _txtShippingAddressLine.text;
       customerShippingAddress.city =
           ((global.base_url == 'https://presstofoods.com/dev/')
               ? 'SAN PEDRO SULA'
@@ -846,6 +745,7 @@ class _CheckoutDetailsPageState extends State<CheckoutDetailsPage> {
         CheckoutSession.getInstance.saveBillingAddress();
         CheckoutSession.getInstance.saveShippingAddress();
       }
+      _saveAddresses();
     }
 
     CheckoutSession.getInstance.billingDetails.rememberDetails =
