@@ -14,6 +14,7 @@ import 'package:label_storemax/helpers/shared_pref.dart';
 import 'package:label_storemax/models/cart_line_item.dart';
 import 'package:label_storemax/models/checkout_session.dart';
 import 'package:label_storemax/models/shipping_type.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:woosignal/models/response/shipping_method.dart';
 import 'package:woosignal/models/response/tax_rate.dart';
 
@@ -64,12 +65,13 @@ class Cart {
   }
 
   Future<String> getTotal({bool withFormat}) async {
+    final prefs = await SharedPreferences.getInstance();
     List<CartLineItem> cartLineItems = await getCart();
     double total = 0;
     cartLineItems.forEach((cartItem) {
       total += (parseWcPrice(cartItem.total) * cartItem.quantity);
     });
-
+    total -= double.parse(prefs.getString('coupon'));
     if (withFormat != null && withFormat == true) {
       return formatDoubleCurrency(total: total);
     }
@@ -77,11 +79,14 @@ class Cart {
   }
 
   Future<String> getSubtotal({bool withFormat}) async {
+    final prefs = await SharedPreferences.getInstance();
+    print('prefs ${prefs.getString('coupon')}');
     List<CartLineItem> cartLineItems = await getCart();
     double subtotal = 0;
     cartLineItems.forEach((cartItem) {
       subtotal += (parseWcPrice(cartItem.subtotal) * cartItem.quantity);
     });
+    subtotal -= double.parse(prefs.getString('coupon'));
     if (withFormat != null && withFormat == true) {
       return formatDoubleCurrency(total: subtotal);
     }
