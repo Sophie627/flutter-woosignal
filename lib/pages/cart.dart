@@ -23,6 +23,7 @@ import 'package:label_storemax/widgets/app_loader.dart';
 import 'package:label_storemax/widgets/buttons.dart';
 import 'package:label_storemax/widgets/woosignal_ui.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'global.dart' as global;
 
 class CartPage extends StatefulWidget {
@@ -45,6 +46,7 @@ class _CartPageState extends State<CartPage> {
   String _couponType = '';
   double _couponAmount = 0;
   String _couponCode = '';
+  double _couponTotalPrice = 0;
 
   @override
   void initState() {
@@ -52,9 +54,12 @@ class _CartPageState extends State<CartPage> {
     _cartLines = [];
     _isLoading = true;
     _cartCheck();
+
   }
 
   _cartCheck() async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString('coupon', '0');
     List<CartLineItem> cart = await Cart.getInstance.getCart();
     if (cart.length <= 0) {
       setState(() {
@@ -77,6 +82,7 @@ class _CartPageState extends State<CartPage> {
       return;
     }
     _cartLines = cartRes.map((json) => CartLineItem.fromJson(json)).toList();
+    couponCalculate();
     if (_cartLines.length > 0) {
       Cart.getInstance.saveCartToPref(cartLineItems: _cartLines);
     }
@@ -303,25 +309,33 @@ class _CartPageState extends State<CartPage> {
             Divider(
               color: Colors.black45,
             ),
-            FutureBuilder<String>(
-              future: Cart.getInstance.getTotal(withFormat: true),
-              builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-                switch (snapshot.connectionState) {
-                  case ConnectionState.waiting:
-                    return Text("");
-                  default:
-                    if (snapshot.hasError)
-                      return Text("");
-                    else
-                      return new Padding(
-                        child: wsRow2Text(context,
-                            text1: trans(context, "Total"),
-                            text2: (_isLoading ? "" : snapshot.data)),
-                        padding: EdgeInsets.only(bottom: 15, top: 15),
-                      );
-                }
-              },
+            new Padding(
+              padding: EdgeInsets.only(bottom: 15, top: 15),
+              child: wsRow2Text(context,
+                text1: trans(context, "Total"),
+                text2: 'L ' + _couponTotalPrice.toStringAsFixed(2),
+              ),
             ),
+//            FutureBuilder<String>(
+//              future: Cart.getInstance.getTotal(withFormat: true),
+//              builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+//                switch (snapshot.connectionState) {
+//                  case ConnectionState.waiting:
+//                    return Text("");
+//                  default:
+//                    if (snapshot.hasError)
+//                      return Text("");
+//                    else
+//                      print('total ${snapshot.data}');
+//                      return new Padding(
+//                        child: wsRow2Text(context,
+//                            text1: trans(context, "Total"),
+//                            text2: (_isLoading ? "" : snapshot.data)),
+//                        padding: EdgeInsets.only(bottom: 15, top: 15),
+//                      );
+//                }
+//              },
+//            ),
             wsPrimaryButton(
               context,
               title: trans(context, "PROCEED TO CHECKOUT"),
@@ -333,14 +347,17 @@ class _CartPageState extends State<CartPage> {
     );
   }
 
-  void couponCalculate() {
+  couponCalculate() async {
+    final prefs = await SharedPreferences.getInstance();
     switch(_couponType) {
       case '': {
         setState(() {
           _couponResultTitle = '';
           _couponResultSubtitle = '';
           _couponResultTailing = '';
+          _couponTotalPrice = getCartTotalPrice();
         });
+        prefs.setString('coupon', '0');
       }
       break;
 
@@ -349,7 +366,9 @@ class _CartPageState extends State<CartPage> {
           _couponResultTitle = 'CUPÓN';
           _couponResultSubtitle = 'Coupon Code Wrong!';
           _couponResultTailing = '';
+          _couponTotalPrice = getCartTotalPrice();
         });
+        prefs.setString('coupon', '0');
       }
       break;
 
@@ -358,7 +377,9 @@ class _CartPageState extends State<CartPage> {
           _couponResultTitle = 'CUPÓN';
           _couponResultSubtitle = _couponCode;
           _couponResultTailing = '-L ' + _couponAmount.toString();
+          _couponTotalPrice = getCartTotalPrice() - _couponAmount;
         });
+        prefs.setString('coupon', _couponAmount.toString());
       }
       break;
 
@@ -367,7 +388,9 @@ class _CartPageState extends State<CartPage> {
           _couponResultTitle = 'CUPÓN';
           _couponResultSubtitle = _couponCode;
           _couponResultTailing = '-L ' + (_couponAmount * getCartQuentity()).toString();
+          _couponTotalPrice = getCartTotalPrice() - _couponAmount * getCartQuentity();
         });
+        prefs.setString('coupon', (_couponAmount * getCartQuentity()).toString());
       }
       break;
 
@@ -376,7 +399,9 @@ class _CartPageState extends State<CartPage> {
           _couponResultTitle = 'CUPÓN';
           _couponResultSubtitle = _couponCode;
           _couponResultTailing = '-L ' + (_couponAmount * getCartTotalPrice() / 100).toString();
+          _couponTotalPrice = getCartTotalPrice() - _couponAmount * getCartTotalPrice() / 100;
         });
+        prefs.setString('coupon', (_couponAmount * getCartTotalPrice() / 100).toString());
       }
       break;
 
