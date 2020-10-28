@@ -104,7 +104,7 @@ class _AddressPageState extends State<AddressPage> {
 
   Widget createBillingAddressView(
       BuildContext context, AsyncSnapshot snapshot) {
-    var values = jsonDecode(snapshot.data);
+    var values = snapshot.data == 'noAddress' ? [{'first_name': 'noAddress'}] : jsonDecode(snapshot.data);
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -132,7 +132,7 @@ class _AddressPageState extends State<AddressPage> {
 
   Widget createShippingAddressView(
       BuildContext context, AsyncSnapshot snapshot) {
-    var values = jsonDecode(snapshot.data);
+    var values = snapshot.data == 'noAddress' ? [{'first_name': 'noAddress'}] : jsonDecode(snapshot.data);
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.center,
