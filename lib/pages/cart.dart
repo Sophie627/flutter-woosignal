@@ -8,6 +8,8 @@
 //  distributed under the License is distributed on an "AS IS" BASIS,
 //  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:label_storemax/helpers/shared_pref/sp_auth.dart';
@@ -20,6 +22,8 @@ import 'package:label_storemax/models/customer_address.dart';
 import 'package:label_storemax/widgets/app_loader.dart';
 import 'package:label_storemax/widgets/buttons.dart';
 import 'package:label_storemax/widgets/woosignal_ui.dart';
+import 'package:http/http.dart' as http;
+import 'global.dart' as global;
 
 class CartPage extends StatefulWidget {
   CartPage();
@@ -34,6 +38,13 @@ class _CartPageState extends State<CartPage> {
   bool _isLoading = false;
   bool _isCartEmpty = false;
   List<CartLineItem> _cartLines;
+  TextEditingController couponController = new TextEditingController();
+  String _couponResultTitle = '';
+  String _couponResultSubtitle = '';
+  String _couponResultTailing = '';
+  String _couponType = '';
+  double _couponAmount = 0;
+  String _couponCode = '';
 
   @override
   void initState() {
@@ -130,6 +141,7 @@ class _CartPageState extends State<CartPage> {
         .updateQuantity(cartLineItem: cartLineItem, incrementQuantity: 1);
     cartLineItem.quantity += 1;
     setState(() {});
+    couponCalculate();
   }
 
   actionDecrementQuantity({CartLineItem cartLineItem}) {
@@ -140,6 +152,7 @@ class _CartPageState extends State<CartPage> {
         .updateQuantity(cartLineItem: cartLineItem, incrementQuantity: -1);
     cartLineItem.quantity -= 1;
     setState(() {});
+    couponCalculate();
   }
 
   actionRemoveItem({int index}) {
@@ -156,6 +169,7 @@ class _CartPageState extends State<CartPage> {
       _isCartEmpty = true;
     }
     setState(() {});
+    couponCalculate();
   }
 
   void _clearCart() {
@@ -168,6 +182,7 @@ class _CartPageState extends State<CartPage> {
         icon: Icons.delete_outline);
     _isCartEmpty = true;
     setState(() {});
+    couponCalculate();
   }
 
   @override
@@ -207,6 +222,7 @@ class _CartPageState extends State<CartPage> {
                 // mainAxisAlignment: MainAxisAlignment.spaceAround,
 
                 title: TextField(
+                  controller: couponController,
                   decoration: InputDecoration(
                     hintText: 'Código Cupón',
                     border: new UnderlineInputBorder(
@@ -220,7 +236,7 @@ class _CartPageState extends State<CartPage> {
                   child: wsPrimaryButton(
                     context,
                     title: "Aplicar Cupón",
-                    action: _onCuponAction(),
+                    action: _onCuponAction,
                   ),
                 ),
               ),
@@ -273,6 +289,17 @@ class _CartPageState extends State<CartPage> {
                             }),
                         flex: 3,
                       )),
+            ListTile(
+              title: Text(_couponResultTitle,
+                style: Theme.of(context).primaryTextTheme.bodyText1,
+              ),
+              subtitle: Text(_couponResultSubtitle,
+                style: Theme.of(context).primaryTextTheme.subtitle1,
+              ),
+              trailing: Text(_couponResultTailing,
+                style: Theme.of(context).primaryTextTheme.bodyText2,
+              ),
+            ),
             Divider(
               color: Colors.black45,
             ),
@@ -306,5 +333,130 @@ class _CartPageState extends State<CartPage> {
     );
   }
 
-  _onCuponAction() {}
+  void couponCalculate() {
+    switch(_couponType) {
+      case '': {
+        setState(() {
+          _couponResultTitle = '';
+          _couponResultSubtitle = '';
+          _couponResultTailing = '';
+        });
+      }
+      break;
+
+      case 'wrong': {
+        setState(() {
+          _couponResultTitle = 'CUPÓN';
+          _couponResultSubtitle = 'Coupon Code Wrong!';
+          _couponResultTailing = '';
+        });
+      }
+      break;
+
+      case 'fixed_cart': {
+        setState(() {
+          _couponResultTitle = 'CUPÓN';
+          _couponResultSubtitle = _couponCode;
+          _couponResultTailing = '-L ' + _couponAmount.toString();
+        });
+      }
+      break;
+
+      case 'fixed_product': {
+        setState(() {
+          _couponResultTitle = 'CUPÓN';
+          _couponResultSubtitle = _couponCode;
+          _couponResultTailing = '-L ' + (_couponAmount * getCartQuentity()).toString();
+        });
+      }
+      break;
+
+      case 'percent': {
+        setState(() {
+          _couponResultTitle = 'CUPÓN';
+          _couponResultSubtitle = _couponCode;
+          _couponResultTailing = '-L ' + (_couponAmount * getCartTotalPrice() / 100).toString();
+        });
+      }
+      break;
+
+      default: {
+        //statements;
+      }
+      break;
+    }
+  }
+
+  _onCuponAction() async {
+    print(couponController.text);
+    print('cartline ${_cartLines[0].quantity}');
+    String code = couponController.text;
+    setState(() {
+      _couponCode = code;
+    });
+    if (code == '') return;
+    var url = global.base_url + 'wp-json/api/flutter/get_coupons';
+    print('url: ${url}');
+    var response = await http.get(url);
+    bool isCodeValid = false;
+
+    if (response.statusCode == 200) {
+      var jsonResponse = json.decode(response.body);
+      jsonResponse.forEach((element) {
+        print('code ${code}');
+        print('elementcode ${element['code']}');
+        print(element['code'] == code);
+        if (element['code'] == code) {
+          isCodeValid = true;
+          var now = new DateTime.now();
+          if (DateTime.parse(element['expiry_date']).isAfter(now)) {
+            setState(() {
+              _couponType = element['type'];
+              _couponAmount = double.parse(element['amount']);
+            });
+          } else {
+            print('This code is expired!');
+          }
+        }
+      });
+      if (!isCodeValid) {
+        print('Coupon Code Wrong!');
+        setState(() {
+          _couponType = 'wrong';
+          _couponAmount = 0;
+//          _couponResultTitle = 'CUPÓN';
+//          _couponResultSubtitle = 'Coupon Code Wrong!';
+//          _couponResultTailing = '';
+        });
+      }
+    } else {
+      print('Coupon Code Wrong!');
+      setState(() {
+        _couponType = 'wrong';
+        _couponAmount = 0;
+//        _couponResultTitle = 'CUPÓN';
+//        _couponResultSubtitle = 'Coupon Code Wrong!';
+//        _couponResultTailing = '';
+      });
+    }
+    couponCalculate();
+  }
+
+  int getCartQuentity() {
+    int quentities = 0;
+    _cartLines.forEach((element) {
+      quentities += element.quantity;
+    });
+
+    return quentities;
+  }
+
+  double getCartTotalPrice() {
+    double total = 0;
+    _cartLines.forEach((element) {
+      total += double.parse(element.subtotal) * element.quantity;
+    });
+
+    return total;
+  }
 }
