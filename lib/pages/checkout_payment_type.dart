@@ -11,6 +11,7 @@
 import 'package:flutter/material.dart';
 import 'package:label_storemax/helpers/tools.dart';
 import 'package:label_storemax/models/checkout_session.dart';
+import 'package:label_storemax/pages/credit_card_input.dart';
 import 'package:label_storemax/widgets/buttons.dart';
 import 'package:label_storemax/widgets/woosignal_ui.dart';
 
@@ -56,6 +57,11 @@ class _CheckoutPaymentTypePageState extends State<CheckoutPaymentTypePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
+                Center(
+                  child: Text("Select or add Credit Card",
+                    style: Theme.of(context).primaryTextTheme.bodyText2,
+                  ),
+                ),
                 Padding(
                   child: Center(
                     child: Image(
@@ -63,7 +69,7 @@ class _CheckoutPaymentTypePageState extends State<CheckoutPaymentTypePage> {
                         fit: BoxFit.fitHeight,
                         height: 100),
                   ),
-                  padding: EdgeInsets.only(top: 20),
+                  padding: EdgeInsets.only(top: 0),
                 ),
                 SizedBox(
                   child: Container(
@@ -103,6 +109,25 @@ class _CheckoutPaymentTypePageState extends State<CheckoutPaymentTypePage> {
                             },
                             separatorBuilder: (cxt, i) => Divider(
                               color: Colors.black12,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          height: 50.0,
+                          padding: EdgeInsets.symmetric(horizontal: 30.0),
+                          child: RaisedButton(
+                            onPressed: () {
+                              Navigator.push (
+                                context,
+                                MaterialPageRoute(builder: (context) => CreditCardInputPage()),
+                              );
+                            },
+                            child: Text('Add another Card',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18.0,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ),
