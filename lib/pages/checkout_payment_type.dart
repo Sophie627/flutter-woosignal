@@ -12,8 +12,11 @@ import 'package:flutter/material.dart';
 import 'package:label_storemax/helpers/tools.dart';
 import 'package:label_storemax/models/checkout_session.dart';
 import 'package:label_storemax/pages/credit_card_input.dart';
+import 'package:label_storemax/widgets/app_loader.dart';
 import 'package:label_storemax/widgets/buttons.dart';
 import 'package:label_storemax/widgets/woosignal_ui.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'global.dart' as global;
 
 class CheckoutPaymentTypePage extends StatefulWidget {
   CheckoutPaymentTypePage();
@@ -25,6 +28,17 @@ class CheckoutPaymentTypePage extends StatefulWidget {
 
 class _CheckoutPaymentTypePageState extends State<CheckoutPaymentTypePage> {
   _CheckoutPaymentTypePageState();
+  List<String> listCardNumber = [];
+  bool isLoading = true;
+
+  static Future<List<String>> _getCardNumbers() async {
+    var key =
+        ((global.base_url == 'https://presstofoods.com/dev/') ? 'SAP' : 'TGU') +
+            '_cardNumber';
+    final prefs = await SharedPreferences.getInstance();
+    final cardNumberList = prefs.getStringList(key) ?? ['no Card'];
+    return cardNumberList;
+  }
 
   @override
   void initState() {
@@ -35,6 +49,14 @@ class _CheckoutPaymentTypePageState extends State<CheckoutPaymentTypePage> {
         CheckoutSession.getInstance.paymentType = getPaymentTypes().first;
       }
     }
+
+    _getCardNumbers().then((value) {
+      print('cardnumber ${value}');
+      setState(() {
+        listCardNumber = value;
+        isLoading = false;
+      });
+    });
   }
 
   @override
@@ -78,34 +100,62 @@ class _CheckoutPaymentTypePageState extends State<CheckoutPaymentTypePage> {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: <Widget>[
                         Expanded(
-                          child: ListView.separated(
-                            itemCount: getPaymentTypes().length,
+                          child: isLoading
+                          ? Center(
+                            child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                showAppLoader(),
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 15),
+                                  child: Text(
+                                    trans(context, "One moment") + "...",
+                                    style: Theme.of(context).primaryTextTheme.subtitle1,
+                                  ),
+                                )
+                              ],
+                            ),
+                          )
+                          : ListView.separated(
+                            itemCount: listCardNumber.length,
                             itemBuilder: (BuildContext context, int index) {
-                              return ListTile(
-                                contentPadding: EdgeInsets.only(
-                                    top: 10, bottom: 10, left: 8, right: 8),
-                                leading: Image(
-                                    image: AssetImage("assets/images/" +
-                                        getPaymentTypes()[index].assetImage),
-                                    width: 60,
-                                    fit: BoxFit.contain,
-                                    alignment: Alignment.center),
-                                title: Text(getPaymentTypes()[index].desc,
-                                    style: Theme.of(context)
-                                        .primaryTextTheme
-                                        .subtitle1),
-                                selected: true,
-                                trailing:
-                                    (CheckoutSession.getInstance.paymentType ==
-                                            getPaymentTypes()[index]
-                                        ? Icon(Icons.check)
-                                        : null),
-                                onTap: () {
-                                  CheckoutSession.getInstance.paymentType =
-                                      getPaymentTypes()[index];
-                                  Navigator.pop(context);
-                                },
-                              );
+                              if(listCardNumber[index] == 'no Card') {
+                                return Padding(
+                                  padding: EdgeInsets.only(
+                                      top: 10, bottom: 10, left: 8, right: 8),
+                                  child: Center(
+                                    child: Text('No saved Card',
+                                      style: Theme.of(context)
+                                          .primaryTextTheme
+                                          .subtitle1),
+                                  ),
+                                );
+                              } else {
+                                return ListTile(
+                                  contentPadding: EdgeInsets.only(
+                                      top: 10, bottom: 10, left: 8, right: 8),
+                                  leading: Image(
+                                      image: AssetImage("assets/images/" +
+                                          getPaymentTypes()[0].assetImage),
+                                      width: 60,
+                                      fit: BoxFit.contain,
+                                      alignment: Alignment.center),
+                                  title: Text(secretCardNumber(listCardNumber[index]),
+                                      style: Theme.of(context)
+                                          .primaryTextTheme
+                                          .subtitle1),
+                                  selected: true,
+                                  trailing:
+                                  (CheckoutSession.getInstance.paymentCard ==
+                                      listCardNumber[index]
+                                      ? Icon(Icons.check)
+                                      : null),
+                                  onTap: () {
+                                    CheckoutSession.getInstance.paymentCard = listCardNumber[index];
+                                    Navigator.pop(context);
+                                  },
+                                );
+                              }
                             },
                             separatorBuilder: (cxt, i) => Divider(
                               color: Colors.black12,

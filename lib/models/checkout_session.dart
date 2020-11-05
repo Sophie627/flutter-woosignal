@@ -32,6 +32,7 @@ class CheckoutSession {
   BillingDetails billingDetails;
   ShippingType shippingType;
   PaymentType paymentType;
+  String paymentCard;
 
   void initSession() {
     billingDetails = BillingDetails();
@@ -42,6 +43,7 @@ class CheckoutSession {
     billingDetails = null;
     shippingType = null;
     paymentType = null;
+    paymentCard = null;
   }
 
   void saveBillingAddress() {
