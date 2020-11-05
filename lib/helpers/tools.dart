@@ -35,6 +35,11 @@ import 'package:woosignal/models/response/products.dart';
 import 'package:woosignal/models/response/tax_rate.dart';
 import 'package:woosignal/woosignal.dart';
 
+String secretCardNumber (String cardNumber) {
+  return 'XXXX XXXX XXXX X' + cardNumber.substring(cardNumber.length - 3);
+}
+
+
 appWooSignal(Function(WooSignal) api) async {
   WooSignal wooSignal = await WooSignal.getInstance(
       config: {"appKey": app_key, "debugMode": app_debug});

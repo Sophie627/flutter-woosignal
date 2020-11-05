@@ -234,7 +234,7 @@ class CheckoutConfirmationPageState extends State<CheckoutConfirmationPage> {
                                       "Add billing & shipping details"),
                                   action: _actionCheckoutDetails,
                                   showBorderBottom: true)),
-                          (CheckoutSession.getInstance.paymentType != null
+                          (CheckoutSession.getInstance.paymentCard != null
                               ? wsCheckoutRow(context,
                                   heading: trans(context, "Payment method"),
                                   leadImage: Image(
@@ -242,15 +242,13 @@ class CheckoutConfirmationPageState extends State<CheckoutConfirmationPage> {
                                           CheckoutSession.getInstance
                                               .paymentType.assetImage),
                                       width: 70),
-                                  leadTitle: CheckoutSession
-                                      .getInstance.paymentType.desc,
+                                  leadTitle: secretCardNumber(CheckoutSession.getInstance.paymentCard),
                                   action: _actionPayWith,
                                   showBorderBottom: true)
                               : wsCheckoutRow(context,
                                   heading: trans(context, "Pay with"),
                                   leadImage: Icon(Icons.payment),
-                                  leadTitle:
-                                      trans(context, "Select a payment method"),
+                                  leadTitle: "Select a payment Card",
                                   action: _actionPayWith,
                                   showBorderBottom: true)),
                           (CheckoutSession.getInstance.shippingType != null
