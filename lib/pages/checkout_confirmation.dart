@@ -15,6 +15,7 @@ import 'package:label_storemax/helpers/tools.dart';
 import 'package:label_storemax/models/cart.dart';
 import 'package:label_storemax/models/checkout_session.dart';
 import 'package:label_storemax/models/customer_address.dart';
+import 'package:label_storemax/pages/pixelpay_gateway.dart';
 import 'package:label_storemax/widgets/app_loader.dart';
 import 'package:label_storemax/widgets/buttons.dart';
 import 'package:label_storemax/widgets/woosignal_ui.dart';
@@ -402,8 +403,11 @@ class CheckoutConfirmationPageState extends State<CheckoutConfirmationPage> {
       _isProcessingPayment = true;
     });
 
-    CheckoutSession.getInstance.paymentType
-        .pay(context, state: this, taxRate: _taxRate);
+
+    Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => PixelPayGatewayPage()));
+
+//    CheckoutSession.getInstance.paymentType
+//        .pay(context, state: this, taxRate: _taxRate);
 
     Future.delayed(Duration(milliseconds: 5000), () {
       setState(() {

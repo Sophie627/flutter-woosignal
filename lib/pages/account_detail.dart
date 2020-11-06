@@ -67,19 +67,18 @@ class _AccountDetailPageState extends State<AccountDetailPage>
 
   _fetchWpUserData() async {
     String userToken = await readAuthToken();
-    print('token: ${userToken}');
 
     WCCustomerInfoResponse wcCustomerInfoResponse;
     try {
       wcCustomerInfoResponse = await WPJsonAPI.instance
           .api((request) => request.wcCustomerInfo(userToken));
     } on Exception catch (_) {
-//      showEdgeAlertWith(
-//        context,
-//        title: trans(context, "Oops!"),
-//        desc: trans(context, "Something went wrong"),
-//        style: EdgeAlertStyle.DANGER,
-//      );
+      showEdgeAlertWith(
+        context,
+        title: trans(context, "Oops!"),
+        desc: trans(context, "Something went wrong"),
+        style: EdgeAlertStyle.DANGER,
+      );
     } finally {
       setState(() {
         _isLoading = false;
