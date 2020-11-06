@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:label_storemax/helpers/tools.dart';
+import 'package:label_storemax/models/checkout_session.dart';
+import 'package:label_storemax/widgets/app_loader.dart';
+import 'package:label_storemax/widgets/woosignal_ui.dart';
 import 'package:webview_flutter_plus/webview_flutter_plus.dart';
+import 'package:woosignal/models/response/tax_rate.dart';
 
 class PixelPayGatewayPage extends StatefulWidget {
   PixelPayGatewayPage();
@@ -12,15 +17,51 @@ class PixelPayGatewayPage extends StatefulWidget {
 class _PixelPayGatewayPageState extends State<PixelPayGatewayPage> {
   WebViewPlusController _controller;
   double _height = 1000;
+  TaxRate _taxRate = null;
+  bool isLoading = true;
+  String totalPrice = '';
+  String keyID = '3753165478';
+  String keyHash = '9078d41cb0713f7e28b174c14eaef324';
+  String endpoint = 'https://ficohsa.pixelpay.app';
+
+  @override
+  void initState() {
+    super.initState();
+
+    CheckoutSession.getInstance.total(withFormat: false, taxRate: _taxRate).then((value) {
+      print('totol ${value}');
+      setState(() {
+        totalPrice = value;
+        isLoading = false;
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('PixelPay Gateway'),
+        backgroundColor: Colors.transparent,
+        title: storeLogo(height: 50),
         centerTitle: true,
       ),
-      body: Center(
+      body: isLoading
+      ? Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            showAppLoader(),
+            Padding(
+              padding: const EdgeInsets.only(top: 15),
+              child: Text(
+                trans(context, "One moment") + "...",
+                style: Theme.of(context).primaryTextTheme.subtitle1,
+              ),
+            )
+          ],
+        ),
+      )
+      : Center(
         child: Container(
           child: WebViewPlus(
             onWebViewCreated: (controller) {
@@ -35,19 +76,19 @@ class _PixelPayGatewayPageState extends State<PixelPayGatewayPage> {
 <body>
 <script src="https://unpkg.com/@pixelpay/sdk"></script>
 <script>
-    PixelPay.setup('3753165478', '9078d41cb0713f7e28b174c14eaef324', 'https://cors-anywhere.herokuapp.com/https://ficohsa.pixelpay.app');
+    PixelPay.setup('""" + keyID + r"""', '""" + keyHash + """', 'https://cors-anywhere.herokuapp.com/""" + endpoint + """');
 
     var order = PixelPay.newOrder();
     order.setOrderID('AC101');
-    order.setAmount(1)
+    order.setAmount(""" + totalPrice + """)
     order.setFullName('John Doe')
     order.setEmail('example@gmail.com')
 
 //    var card = PixelPay.newCard();
-//    card.setCardNumber("4167441418762545")
-//    card.setCvv("111")
-//    card.setCardHolder("TEST CARD")
-//    card.setExpirationDate("02/23")
+//    card.setCardNumber('4167441418762545')
+//    card.setCvv('111')
+//    card.setCardHolder('TEST CARD')
+//    card.setExpirationDate('02/23')
 //    order.addCard(card);
 //
 //    var billing = PixelPay.newBilling();
