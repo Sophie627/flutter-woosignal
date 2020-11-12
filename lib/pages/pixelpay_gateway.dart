@@ -5,6 +5,7 @@ import 'package:label_storemax/widgets/app_loader.dart';
 import 'package:label_storemax/widgets/woosignal_ui.dart';
 import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 import 'package:woosignal/models/response/tax_rate.dart';
+import 'global.dart';
 
 class PixelPayGatewayPage extends StatefulWidget {
   PixelPayGatewayPage();
@@ -20,9 +21,8 @@ class _PixelPayGatewayPageState extends State<PixelPayGatewayPage> {
   TaxRate _taxRate = null;
   bool isLoading = true;
   String totalPrice = '';
-  String keyID = '3753165478';
-  String keyHash = '9078d41cb0713f7e28b174c14eaef324';
-  String endpoint = 'https://ficohsa.pixelpay.app';
+  bool isChecking = true;
+  String result = '';
 
   @override
   void initState() {
@@ -62,11 +62,15 @@ class _PixelPayGatewayPageState extends State<PixelPayGatewayPage> {
         ),
       )
       : Center(
-        child: Container(
-          child: WebViewPlus(
-            onWebViewCreated: (controller) {
-              controller.loadString(r"""
-           <!doctype html>
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              height: 1.0,
+              child: WebViewPlus(
+                onWebViewCreated: (controller) {
+                  controller.loadString(r"""
+<!doctype html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
@@ -79,48 +83,72 @@ class _PixelPayGatewayPageState extends State<PixelPayGatewayPage> {
     PixelPay.setup('""" + keyID + r"""', '""" + keyHash + """', 'https://cors-anywhere.herokuapp.com/""" + endpoint + """');
 
     var order = PixelPay.newOrder();
-    order.setOrderID('AC101');
-    order.setAmount(""" + totalPrice + """)
+    order.setOrderID('AD101');
+    order.setAmount(1)
+//    order.setAmount(""" + totalPrice + """)
     order.setFullName('John Doe')
     order.setEmail('example@gmail.com')
 
-//    var card = PixelPay.newCard();
-//    card.setCardNumber('4167441418762545')
-//    card.setCvv('111')
-//    card.setCardHolder('TEST CARD')
-//    card.setExpirationDate('02/23')
-//    order.addCard(card);
-//
-//    var billing = PixelPay.newBilling();
-//    billing.setCity('San Pedro');
-//    billing.setState('CR');
-//    billing.setCountry('HN');
-//    billing.setZip('21102');
-//    billing.setAddress('Ave. Circunvalacion');
-//    billing.setPhoneNumber('95852921');
+    var card = PixelPay.newCard();
+    card.setCardNumber('4446850202391415')
+    card.setCvv(186)
+    card.setCardHolder('TEST CARD')
+    card.setExpirationDate('0524')
+    order.addCard(card);
+
+    var billing = PixelPay.newBilling();
+    billing.setCity('San Pedro');
+    billing.setState('CR');
+    billing.setCountry('HN');
+    billing.setZip('21102');
+    billing.setAddress('Ave. Circunvalacion');
+    billing.setPhoneNumber('95852921');
+    order.addBilling(billing);
 
     PixelPay.payOrder(order).then(function(response) {
         console.log(response);
-        alert('ok');
+        window.Print.postMessage(response.data.transaction_id);
     }).catch(function(err) {
         console.error('Error: ', err);
-        alert('error');
+        window.Print.postMessage('error');
     });
 </script>
 </body>
 </html>
       """);
-            },
-            onPageFinished: (url) {
-              _controller.getHeight().then((double height) {
-                print("Height: " + height.toString());
-                setState(() {
-                  _height = height;
-                });
-              });
-            },
-            javascriptMode: JavascriptMode.unrestricted,
-          ),
+                },
+                onPageFinished: (url) {
+                  _controller.getHeight().then((double height) {
+                    print("Height: " + height.toString());
+                    setState(() {
+                      _height = height;
+                    });
+                  });
+                },
+                javascriptMode: JavascriptMode.unrestricted,
+                javascriptChannels: Set.from([
+                  JavascriptChannel(
+                      name: 'Print',
+                      onMessageReceived: (JavascriptMessage message) {
+                        print(message.message);
+                        setState(() {
+                          isChecking = false;
+                          result = message.message;
+                        });
+                      }
+                  )
+                ]),
+              ),
+            ),
+            isChecking ? showAppLoader() : SizedBox(height: 0,),
+            Padding(
+              padding: const EdgeInsets.only(top: 15),
+              child: Text(
+                isChecking ? trans(context, "One moment") + "..." : result,
+                style: Theme.of(context).primaryTextTheme.subtitle1,
+              ),
+            )
+          ],
         ),
       ),
     );
