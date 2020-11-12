@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:label_storemax/helpers/tools.dart';
+import 'package:label_storemax/models/cart.dart';
 import 'package:label_storemax/models/checkout_session.dart';
 import 'package:label_storemax/models/customer_address.dart';
+import 'package:label_storemax/pages/home.dart';
 import 'package:label_storemax/widgets/app_loader.dart';
 import 'package:label_storemax/widgets/woosignal_ui.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
@@ -29,12 +31,6 @@ class _PixelPayGatewayPageState extends State<PixelPayGatewayPage> {
 
   String totalPrice = '';
   String orderID;
-  String cardNumber;
-  String cvv;
-  String cardHolder;
-  String expiryDate;
-  String city;
-  String address;
 
   String result = '';
   String title = '';
@@ -108,8 +104,7 @@ class _PixelPayGatewayPageState extends State<PixelPayGatewayPage> {
 
     var order = PixelPay.newOrder();
     order.setOrderID('AE10111');
-    order.setAmount(1)
-//    order.setAmount(""" + totalPrice + """)
+    order.setAmount(""" + totalPrice + """)
     order.setFullName('""" + CheckoutSession.getInstance.billingDetails.billingAddress.firstName + ' ' + CheckoutSession.getInstance.billingDetails.billingAddress.lastName + """')
     order.setEmail('"""+ CheckoutSession.getInstance.billingDetails.billingAddress.emailAddress + """')
 
@@ -168,7 +163,7 @@ class _PixelPayGatewayPageState extends State<PixelPayGatewayPage> {
                             title = 'Warning';
                             type = AlertType.warning;
                           } else {
-                            result = message.message;
+                            result = 'Total Price: L' + totalPrice + '\n' + message.message;
                             title = 'Success';
                             type = AlertType.success;
                           }
@@ -194,6 +189,9 @@ class _PixelPayGatewayPageState extends State<PixelPayGatewayPage> {
 
   showAlert(context, title, desc, type) {
     Alert(
+      closeFunction: () {
+        alertAction(type);
+      },
       context: context,
       type: type,
       title: title,
@@ -215,9 +213,10 @@ class _PixelPayGatewayPageState extends State<PixelPayGatewayPage> {
 
   alertAction(type) {
     if (type == AlertType.success) {
+      Cart.getInstance.clear();
       Navigator.push (
         context,
-        MaterialPageRoute(builder: (context) => CheckoutConfirmationPage()),
+        MaterialPageRoute(builder: (context) => HomePage()),
       );
     } else {
       Navigator.popUntil(context, ModalRoute.withName('/checkout'));
