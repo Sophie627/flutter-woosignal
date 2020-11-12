@@ -29,7 +29,37 @@ class CheckoutPaymentTypePage extends StatefulWidget {
 class _CheckoutPaymentTypePageState extends State<CheckoutPaymentTypePage> {
   _CheckoutPaymentTypePageState();
   List<String> listCardNumber = [];
+  List<String> listExpiryDate = [];
+  List<String> listCVVCode = [];
+  List<String> listCardHolderName = [];
   bool isLoading = true;
+
+  static Future<List<String>> _getExpiryDates() async {
+    var key =
+        ((global.base_url == 'https://presstofoods.com/dev/') ? 'SAP' : 'TGU') +
+            '_expiryDate';
+    final prefs = await SharedPreferences.getInstance();
+    final expiryDateList = prefs.getStringList(key) ?? ['no Card'];
+    return expiryDateList;
+  }
+
+  static Future<List<String>> _getCardHolderNames() async {
+    var key =
+        ((global.base_url == 'https://presstofoods.com/dev/') ? 'SAP' : 'TGU') +
+            '_cardHolderName';
+    final prefs = await SharedPreferences.getInstance();
+    final cardHolderNameList = prefs.getStringList(key) ?? ['no Card'];
+    return cardHolderNameList;
+  }
+
+  static Future<List<String>> _getCVVCodes() async {
+    var key =
+        ((global.base_url == 'https://presstofoods.com/dev/') ? 'SAP' : 'TGU') +
+            '_cvvCode';
+    final prefs = await SharedPreferences.getInstance();
+    final cvvCodeList = prefs.getStringList(key) ?? ['no Card'];
+    return cvvCodeList;
+  }
 
   static Future<List<String>> _getCardNumbers() async {
     var key =
@@ -54,6 +84,30 @@ class _CheckoutPaymentTypePageState extends State<CheckoutPaymentTypePage> {
       print('cardnumber ${value}');
       setState(() {
         listCardNumber = value;
+        isLoading = false;
+      });
+    });
+
+    _getExpiryDates().then((value) {
+      print('expiryDate ${value}');
+      setState(() {
+        listExpiryDate = value;
+        isLoading = false;
+      });
+    });
+
+    _getCVVCodes().then((value) {
+      print('cvvCode ${value}');
+      setState(() {
+        listCVVCode = value;
+        isLoading = false;
+      });
+    });
+
+    _getCardHolderNames().then((value) {
+      print('cardHolderName ${value}');
+      setState(() {
+        listCardHolderName = value;
         isLoading = false;
       });
     });
@@ -137,7 +191,7 @@ class _CheckoutPaymentTypePageState extends State<CheckoutPaymentTypePage> {
                                   leading: Image(
                                       image: AssetImage("assets/images/" +
                                           getPaymentTypes()[0].assetImage),
-                                      width: 60,
+                                      width: 0,
                                       fit: BoxFit.contain,
                                       alignment: Alignment.center),
                                   title: Text(secretCardNumber(listCardNumber[index]),
@@ -152,6 +206,9 @@ class _CheckoutPaymentTypePageState extends State<CheckoutPaymentTypePage> {
                                       : null),
                                   onTap: () {
                                     CheckoutSession.getInstance.paymentCard = listCardNumber[index];
+                                    CheckoutSession.getInstance.paymentExpiryDate = listExpiryDate[index];
+                                    CheckoutSession.getInstance.paymentCVVCode = listCVVCode[index];
+                                    CheckoutSession.getInstance.paymentCardHolderName = listCardHolderName[index];
                                     Navigator.pop(context);
                                   },
                                 );

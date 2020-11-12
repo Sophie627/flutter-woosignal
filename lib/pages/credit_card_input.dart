@@ -226,6 +226,10 @@ class CreditCardInputPageState extends State<CreditCardInputPage> {
     _saveCardHolderNames();
 
     CheckoutSession.getInstance.paymentCard = cardNumber;
+    CheckoutSession.getInstance.paymentExpiryDate = expiryDate;
+    CheckoutSession.getInstance.paymentCVVCode = cvvCode;
+    CheckoutSession.getInstance.paymentCardHolderName = cardHolderName;
+
 
     Navigator.push (
       context,

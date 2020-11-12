@@ -242,7 +242,7 @@ class CheckoutConfirmationPageState extends State<CheckoutConfirmationPage> {
                                       image: AssetImage("assets/images/" +
                                           CheckoutSession.getInstance
                                               .paymentType.assetImage),
-                                      width: 70),
+                                      width: 0),
                                   leadTitle: secretCardNumber(CheckoutSession.getInstance.paymentCard),
                                   action: _actionPayWith,
                                   showBorderBottom: true)

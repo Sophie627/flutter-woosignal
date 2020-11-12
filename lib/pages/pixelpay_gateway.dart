@@ -1,10 +1,14 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:label_storemax/helpers/tools.dart';
 import 'package:label_storemax/models/checkout_session.dart';
+import 'package:label_storemax/models/customer_address.dart';
 import 'package:label_storemax/widgets/app_loader.dart';
 import 'package:label_storemax/widgets/woosignal_ui.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:webview_flutter_plus/webview_flutter_plus.dart';
 import 'package:woosignal/models/response/tax_rate.dart';
+import 'checkout_confirmation.dart';
 import 'global.dart';
 
 class PixelPayGatewayPage extends StatefulWidget {
@@ -19,10 +23,23 @@ class _PixelPayGatewayPageState extends State<PixelPayGatewayPage> {
   WebViewPlusController _controller;
   double _height = 1000;
   TaxRate _taxRate = null;
+
   bool isLoading = true;
-  String totalPrice = '';
   bool isChecking = true;
+
+  String totalPrice = '';
+  String orderID;
+  String cardNumber;
+  String cvv;
+  String cardHolder;
+  String expiryDate;
+  String city;
+  String address;
+
   String result = '';
+  String title = '';
+  AlertType type;
+  Timer _timer;
 
   @override
   void initState() {
@@ -35,6 +52,13 @@ class _PixelPayGatewayPageState extends State<PixelPayGatewayPage> {
         isLoading = false;
       });
     });
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _timer.cancel();
   }
 
   @override
@@ -83,31 +107,30 @@ class _PixelPayGatewayPageState extends State<PixelPayGatewayPage> {
     PixelPay.setup('""" + keyID + r"""', '""" + keyHash + """', 'https://cors-anywhere.herokuapp.com/""" + endpoint + """');
 
     var order = PixelPay.newOrder();
-    order.setOrderID('AD101');
+    order.setOrderID('AE10111');
     order.setAmount(1)
 //    order.setAmount(""" + totalPrice + """)
-    order.setFullName('John Doe')
-    order.setEmail('example@gmail.com')
+    order.setFullName('""" + CheckoutSession.getInstance.billingDetails.billingAddress.firstName + ' ' + CheckoutSession.getInstance.billingDetails.billingAddress.lastName + """')
+    order.setEmail('"""+ CheckoutSession.getInstance.billingDetails.billingAddress.emailAddress + """')
 
     var card = PixelPay.newCard();
-    card.setCardNumber('4446850202391415')
-    card.setCvv(186)
-    card.setCardHolder('TEST CARD')
-    card.setExpirationDate('0524')
+    card.setCardNumber('""" + CheckoutSession.getInstance.paymentCard.replaceAll(' ', '') + """')
+    card.setCvv(""" + CheckoutSession.getInstance.paymentCVVCode + """)
+    card.setCardHolder('""" + CheckoutSession.getInstance.paymentCardHolderName + """')
+    card.setExpirationDate('""" + CheckoutSession.getInstance.paymentExpiryDate + """')
     order.addCard(card);
 
     var billing = PixelPay.newBilling();
-    billing.setCity('San Pedro');
-    billing.setState('CR');
+    billing.setCity('""" + CheckoutSession.getInstance.billingDetails.billingAddress.city + """');
+    billing.setState('FM');
     billing.setCountry('HN');
-    billing.setZip('21102');
-    billing.setAddress('Ave. Circunvalacion');
-    billing.setPhoneNumber('95852921');
+    billing.setAddress('""" + CheckoutSession.getInstance.billingDetails.billingAddress.addressLine + """');
+    billing.setPhoneNumber('22396410');
     order.addBilling(billing);
 
     PixelPay.payOrder(order).then(function(response) {
         console.log(response);
-        window.Print.postMessage(response.data.transaction_id);
+        window.Print.postMessage('Transaction ID: ' + response.data.transaction_id);
     }).catch(function(err) {
         console.error('Error: ', err);
         window.Print.postMessage('error');
@@ -117,12 +140,20 @@ class _PixelPayGatewayPageState extends State<PixelPayGatewayPage> {
 </html>
       """);
                 },
+
                 onPageFinished: (url) {
-                  _controller.getHeight().then((double height) {
-                    print("Height: " + height.toString());
+                  print('Page finished loading');
+                  _timer = Timer.periodic(new Duration(seconds: 7), (timer) {
                     setState(() {
-                      _height = height;
+                      isChecking = false;
+                      if (result == '') {
+                        result = 'Check your information again...';
+                        title = 'Error';
+                        type = AlertType.error;
+                      }
                     });
+                    showAlert(context, title, result, type);
+                    _timer.cancel();
                   });
                 },
                 javascriptMode: JavascriptMode.unrestricted,
@@ -132,8 +163,15 @@ class _PixelPayGatewayPageState extends State<PixelPayGatewayPage> {
                       onMessageReceived: (JavascriptMessage message) {
                         print(message.message);
                         setState(() {
-                          isChecking = false;
-                          result = message.message;
+                          if (message.message == 'error') {
+                            result = 'Please check your information and try again';
+                            title = 'Warning';
+                            type = AlertType.warning;
+                          } else {
+                            result = message.message;
+                            title = 'Success';
+                            type = AlertType.success;
+                          }
                         });
                       }
                   )
@@ -152,5 +190,37 @@ class _PixelPayGatewayPageState extends State<PixelPayGatewayPage> {
         ),
       ),
     );
+  }
+
+  showAlert(context, title, desc, type) {
+    Alert(
+      context: context,
+      type: type,
+      title: title,
+      desc: desc,
+      buttons: [
+        DialogButton(
+          child: Text(
+            "OK",
+            style: TextStyle(color: Colors.white, fontSize: 20),
+          ),
+          onPressed: () {
+            alertAction(type);
+          },
+          width: 120,
+        )
+      ],
+    ).show();
+  }
+
+  alertAction(type) {
+    if (type == AlertType.success) {
+      Navigator.push (
+        context,
+        MaterialPageRoute(builder: (context) => CheckoutConfirmationPage()),
+      );
+    } else {
+      Navigator.popUntil(context, ModalRoute.withName('/checkout'));
+    }
   }
 }
