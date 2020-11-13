@@ -11,6 +11,7 @@
 import 'package:label_storemax/helpers/tools.dart';
 import 'package:label_storemax/models/payment_type.dart';
 import 'package:label_storemax/providers/cash_on_delivery.dart';
+import 'package:label_storemax/providers/pixel_pay.dart';
 import 'package:label_storemax/providers/razor_pay.dart';
 import 'package:label_storemax/providers/stripe_pay.dart';
 
@@ -46,6 +47,16 @@ List<PaymentType> arrPaymentMethods = [
       pay: razorPay,
     ),
   ),
+
+    addPayment(
+    PaymentType(
+      id: 4,
+      name: "PixelPay",
+      desc: "PixelPay",
+      assetImage: "dark_powered_by_stripe.png",
+      pay: pixelPay,
+    ),
+  )
 
   // e.g. add more here
 

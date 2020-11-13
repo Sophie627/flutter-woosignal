@@ -322,6 +322,8 @@ class _CheckoutDetailsPageState extends State<CheckoutDetailsPage> {
   void initState() {
     super.initState();
 
+
+
     newAddress = '';
     _getAddresses().then((value) {
       addresses = value;

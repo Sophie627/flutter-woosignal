@@ -200,6 +200,7 @@ checkout(
       .total(withFormat: false, taxRate: taxRate);
   BillingDetails billingDetails = CheckoutSession.getInstance.billingDetails;
   Cart cart = Cart.getInstance;
+  print("ok------------checkout ${cartTotal}");
   return await completeCheckout(cartTotal, billingDetails, cart);
 }
 

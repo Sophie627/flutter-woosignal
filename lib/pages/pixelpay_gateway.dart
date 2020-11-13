@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:label_storemax/helpers/data/order_wc.dart';
 import 'package:label_storemax/helpers/tools.dart';
 import 'package:label_storemax/models/cart.dart';
 import 'package:label_storemax/models/checkout_session.dart';
@@ -9,6 +10,8 @@ import 'package:label_storemax/widgets/app_loader.dart';
 import 'package:label_storemax/widgets/woosignal_ui.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:webview_flutter_plus/webview_flutter_plus.dart';
+import 'package:woosignal/models/payload/order_wc.dart';
+import 'package:woosignal/models/response/order.dart';
 import 'package:woosignal/models/response/tax_rate.dart';
 import 'checkout_confirmation.dart';
 import 'global.dart';
@@ -40,6 +43,11 @@ class _PixelPayGatewayPageState extends State<PixelPayGatewayPage> {
   @override
   void initState() {
     super.initState();
+
+    setState(() {
+      orderID = DateTime.now().microsecondsSinceEpoch.toString();
+      print(orderID);
+    });
 
     CheckoutSession.getInstance.total(withFormat: false, taxRate: _taxRate).then((value) {
       print('totol ${value}');
@@ -103,7 +111,7 @@ class _PixelPayGatewayPageState extends State<PixelPayGatewayPage> {
     PixelPay.setup('""" + keyID + r"""', '""" + keyHash + """', 'https://cors-anywhere.herokuapp.com/""" + endpoint + """');
 
     var order = PixelPay.newOrder();
-    order.setOrderID('AE10111');
+    order.setOrderID('""" + orderID + """');
     order.setAmount(""" + totalPrice + """)
     order.setFullName('""" + CheckoutSession.getInstance.billingDetails.billingAddress.firstName + ' ' + CheckoutSession.getInstance.billingDetails.billingAddress.lastName + """')
     order.setEmail('"""+ CheckoutSession.getInstance.billingDetails.billingAddress.emailAddress + """')
@@ -211,13 +219,26 @@ class _PixelPayGatewayPageState extends State<PixelPayGatewayPage> {
     ).show();
   }
 
-  alertAction(type) {
+  alertAction(type) async {
     if (type == AlertType.success) {
-      Cart.getInstance.clear();
-      Navigator.push (
-        context,
-        MaterialPageRoute(builder: (context) => HomePage()),
-      );
+
+      OrderWC orderWC = await buildOrderWC(taxRate: _taxRate, markPaid: true);
+      Order order = await appWooSignal((api) => api.createOrder(orderWC));
+
+      print('order ${order}');
+
+      if (order != null) {
+        Navigator.pushNamed(context, "/checkout-status", arguments: order);
+      } else {
+        showEdgeAlertWith(
+          context,
+          title: trans(context, "Error"),
+          desc: trans(
+              context,
+              trans(context,
+                  "Something went wrong, please contact our store")),
+        );
+      }
     } else {
       Navigator.popUntil(context, ModalRoute.withName('/checkout'));
     }

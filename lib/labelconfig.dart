@@ -95,8 +95,8 @@ const app_stripe_live_mode = false;
 const use_wp_login = true;
 
 String app_base_url = (global.base_url == 'https://presstofoods.com/dev/tgu')
-    ? "https://presstofoods.com/dev"
-    : "https://presstofoods.com/dev/tgu"; // change to your url
+    ? "https://presstofoods.com/dev/tgu"
+    : "https://presstofoods.com/dev"; // change to your url
 const app_forgot_password_url =
     "https://presstofoods.com/dev/wp-login.php?action=lostpassword"; // change to your forgot password url
 const app_wp_api_path = "/wp-json"; // By default "/wp-json" should work
