@@ -10,8 +10,8 @@
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_html/flutter_html.dart';
-import 'package:flutter_html/style.dart';
+//import 'package:flutter_html/flutter_html.dart';
+//import 'package:flutter_html/style.dart';
 import 'package:label_storemax/labelconfig.dart';
 import 'package:label_storemax/models/cart.dart';
 import 'package:label_storemax/models/cart_line_item.dart';
@@ -561,15 +561,15 @@ Widget wsCardCartItem(BuildContext context,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    Html(
-                      data: cartLineItem.name,
-                    ),
-//                    Text(
-//                      cartLineItem.name,
-//                      style: Theme.of(context).primaryTextTheme.subtitle1,
-//                      overflow: TextOverflow.ellipsis,
-//                      maxLines: 3,
+//                    Html(
+//                      data: cartLineItem.name,
 //                    ),
+                    Text(
+                      cartLineItem.name,
+                      style: Theme.of(context).primaryTextTheme.subtitle1,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 3,
+                    ),
                     (cartLineItem.variationOptions != null
                         ? Text(cartLineItem.variationOptions,
                             style: Theme.of(context).primaryTextTheme.bodyText1)

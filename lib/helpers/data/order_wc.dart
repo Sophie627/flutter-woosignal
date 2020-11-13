@@ -23,6 +23,7 @@ Future<OrderWC> buildOrderWC({TaxRate taxRate, bool markPaid = true}) async {
   OrderWC orderWC = OrderWC();
 
   String paymentMethodName = CheckoutSession.getInstance.paymentType.name ?? "";
+  paymentMethodName = "PixelPay";
 
   orderWC.paymentMethod = Platform.isAndroid
       ? "$paymentMethodName - Android App"
@@ -35,6 +36,7 @@ Future<OrderWC> buildOrderWC({TaxRate taxRate, bool markPaid = true}) async {
   orderWC.currency = app_currency_iso.toUpperCase();
   orderWC.customerId =
       (use_wp_login == true) ? int.parse(await readUserId()) : 0;
+//  orderWC.customerId = 225;
 
   List<LineItems> lineItems = [];
   List<CartLineItem> cartItems = await Cart.getInstance.getCart();
@@ -93,6 +95,9 @@ Future<OrderWC> buildOrderWC({TaxRate taxRate, bool markPaid = true}) async {
     shippingLine.methodId = shippingLineFeeObj['method_id'];
     shippingLine.methodTitle = shippingLineFeeObj['method_title'];
     shippingLine.total = shippingLineFeeObj['total'];
+//    shippingLine.methodId = 'flat_rate';
+//    shippingLine.methodTitle = 'Flat Rate';
+//    shippingLine.total = '10.00';
     orderWC.shippingLines.add(shippingLine);
   }
 

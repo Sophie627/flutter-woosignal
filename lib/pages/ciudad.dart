@@ -63,6 +63,7 @@ class _CiudadState extends State<Ciudad> {
   static Future<String> _getLastCity() async {
     final prefs = await SharedPreferences.getInstance();
     final value = prefs.getString('lastCity') ?? 'noCity';
+    print('city $value');
     return value;
   }
 

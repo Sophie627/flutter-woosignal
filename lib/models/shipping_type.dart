@@ -100,6 +100,11 @@ class ShippingType {
           tmpShippingLinesObj["method_id"] = localPickup.methodId;
           tmpShippingLinesObj["total"] = this.cost;
           break;
+        case "flexible":
+          tmpShippingLinesObj["method_title"] = "Flexible Shipping";
+          tmpShippingLinesObj["method_id"] = "flexible";
+          tmpShippingLinesObj["total"] = this.cost;
+          break;
         default:
           return null;
           break;

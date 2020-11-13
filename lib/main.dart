@@ -92,7 +92,7 @@ void main() async {
           case '/account-landing':
             return PageTransition(
               child: AccountLandingPage(),
-              type: PageTransitionType.downToUp,
+              type: PageTransitionType.fade,
             );
 
           case '/browse-category':
@@ -181,7 +181,7 @@ void main() async {
           case '/checkout-details':
             return PageTransition(
               child: CheckoutDetailsPage(),
-              type: PageTransitionType.downToUp,
+              type: PageTransitionType.fade,
             );
 
           case '/about':
@@ -193,19 +193,19 @@ void main() async {
           case '/checkout-payment-type':
             return PageTransition(
               child: CheckoutPaymentTypePage(),
-              type: PageTransitionType.downToUp,
+              type: PageTransitionType.fade,
             );
 
           case '/checkout-shipping-type':
             return PageTransition(
               child: CheckoutShippingTypePage(),
-              type: PageTransitionType.downToUp,
+              type: PageTransitionType.fade,
             );
 
           case '/home-search':
             return PageTransition(
               child: HomeSearchPage(),
-              type: PageTransitionType.downToUp,
+              type: PageTransitionType.fade,
             );
           default:
             return null;

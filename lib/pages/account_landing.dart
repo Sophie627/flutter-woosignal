@@ -234,6 +234,7 @@ class _AccountLandingPageState extends State<AccountLandingPage> {
 
       if (wpUserLoginResponse != null && wpUserLoginResponse.status == 200) {
         String token = wpUserLoginResponse.data.userToken;
+        print('userID ${wpUserLoginResponse.data.userId}');
         authUser(token);
         storeUserId(wpUserLoginResponse.data.userId.toString());
 

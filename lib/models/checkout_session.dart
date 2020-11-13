@@ -33,6 +33,9 @@ class CheckoutSession {
   ShippingType shippingType;
   PaymentType paymentType;
   String paymentCard;
+  String paymentExpiryDate;
+  String paymentCVVCode;
+  String paymentCardHolderName;
 
   void initSession() {
     billingDetails = BillingDetails();
