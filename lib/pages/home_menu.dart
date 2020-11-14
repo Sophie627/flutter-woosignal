@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:label_storemax/helpers/shared_pref/sp_auth.dart';
 import 'package:label_storemax/labelconfig.dart';
 import 'package:label_storemax/pages/address.dart';
+import 'package:label_storemax/pages/checkout_payment_type.dart';
 import 'package:label_storemax/pages/creditcard.dart';
 import 'package:label_storemax/widgets/menu_item.dart';
 import 'package:label_storemax/helpers/tools.dart';
@@ -122,7 +123,11 @@ class _HomeMenuPageState extends State<HomeMenuPage> {
 
   void _actionCreditCard() {
     Navigator.push(
-        context, MaterialPageRoute(builder: (context) => CreditCardPage()));
+        context, MaterialPageRoute(builder: (context) => CheckoutPaymentTypePage(
+          isCheckout: false,
+        )));
+    // Navigator.push(
+    //     context, MaterialPageRoute(builder: (context) => CreditCardPage()));
   }
 
   void _actionAddress() {

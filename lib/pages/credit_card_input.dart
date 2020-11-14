@@ -4,13 +4,19 @@ import 'package:flutter_credit_card/credit_card_model.dart';
 import 'package:flutter_credit_card/credit_card_widget.dart';
 import 'package:label_storemax/helpers/tools.dart';
 import 'package:label_storemax/models/checkout_session.dart';
+import 'package:label_storemax/pages/home_menu.dart';
 import 'package:label_storemax/widgets/buttons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'checkout_confirmation.dart';
 import 'global.dart' as global;
 
 class CreditCardInputPage extends StatefulWidget {
-  CreditCardInputPage({Key key}) : super(key: key);
+
+  final bool isCheckout;
+
+  CreditCardInputPage({Key key,
+    this.isCheckout = true,
+  }) : super(key: key);
 
   @override
   CreditCardInputPageState createState() =>
@@ -118,8 +124,7 @@ class CreditCardInputPageState extends State<CreditCardInputPage> {
 
   static Future<List<String>> _getExpiryDates() async {
     var key =
-        ((global.base_url == 'https://presstofoods.com/dev/') ? 'SAP' : 'TGU') +
-            '_expiryDate';
+        'expiryDate';
     final prefs = await SharedPreferences.getInstance();
     final expiryDateList = prefs.getStringList(key) ?? ['no Card'];
     return expiryDateList;
@@ -130,8 +135,7 @@ class CreditCardInputPageState extends State<CreditCardInputPage> {
     List<String> listExpiryDate = [];
 
     var key_expiryDate =
-        ((global.base_url == 'https://presstofoods.com/dev/') ? 'SAP' : 'TGU') +
-            '_expiryDate';
+        'expiryDate';
 
     _getExpiryDates().then((value) async {
       if (value[0] == 'no Card') {
@@ -151,8 +155,7 @@ class CreditCardInputPageState extends State<CreditCardInputPage> {
 
   static Future<List<String>> _getCardHolderNames() async {
     var key =
-        ((global.base_url == 'https://presstofoods.com/dev/') ? 'SAP' : 'TGU') +
-            '_cardHolderName';
+        'cardHolderName';
     final prefs = await SharedPreferences.getInstance();
     final cardHolderNameList = prefs.getStringList(key) ?? ['no Card'];
     return cardHolderNameList;
@@ -163,8 +166,7 @@ class CreditCardInputPageState extends State<CreditCardInputPage> {
     List<String> listCardHolderName = [];
 
     var key_cardHolderName =
-        ((global.base_url == 'https://presstofoods.com/dev/') ? 'SAP' : 'TGU') +
-            '_cardHolderName';
+        'cardHolderName';
 
     _getCardHolderNames().then((value) async {
       if (value[0] == 'no Card') {
@@ -184,8 +186,7 @@ class CreditCardInputPageState extends State<CreditCardInputPage> {
 
   static Future<List<String>> _getCVVCodes() async {
     var key =
-        ((global.base_url == 'https://presstofoods.com/dev/') ? 'SAP' : 'TGU') +
-            '_cvvCode';
+        'cvvCode';
     final prefs = await SharedPreferences.getInstance();
     final cvvCodeList = prefs.getStringList(key) ?? ['no Card'];
     return cvvCodeList;
@@ -196,8 +197,7 @@ class CreditCardInputPageState extends State<CreditCardInputPage> {
     List<String> listCVVCodes = [];
 
     var key_cvvCode =
-        ((global.base_url == 'https://presstofoods.com/dev/') ? 'SAP' : 'TGU') +
-            '_cvvCode';
+        'cvvCode';
 
     _getCVVCodes().then((value) async {
       if (value[0] == 'no Card') {
@@ -227,9 +227,16 @@ class CreditCardInputPageState extends State<CreditCardInputPage> {
     CheckoutSession.getInstance.paymentCardHolderName = cardHolderName;
 
 
-    Navigator.push (
-      context,
-      MaterialPageRoute(builder: (context) => CheckoutConfirmationPage()),
-    );
+    if (widget.isCheckout) {
+      Navigator.push (
+        context,
+        MaterialPageRoute(builder: (context) => CheckoutConfirmationPage()),
+      );
+    } else {
+      Navigator.push (
+        context,
+        MaterialPageRoute(builder: (context) => HomeMenuPage()),
+      );
+    }
   }
 }

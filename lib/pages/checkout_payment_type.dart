@@ -19,7 +19,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'global.dart' as global;
 
 class CheckoutPaymentTypePage extends StatefulWidget {
-  CheckoutPaymentTypePage();
+
+  final bool isCheckout;
+
+  CheckoutPaymentTypePage({
+    this.isCheckout = true,
+  });
 
   @override
   _CheckoutPaymentTypePageState createState() =>
@@ -36,8 +41,7 @@ class _CheckoutPaymentTypePageState extends State<CheckoutPaymentTypePage> {
 
   static Future<List<String>> _getExpiryDates() async {
     var key =
-        ((global.base_url == 'https://presstofoods.com/dev/') ? 'SAP' : 'TGU') +
-            '_expiryDate';
+        'expiryDate';
     final prefs = await SharedPreferences.getInstance();
     final expiryDateList = prefs.getStringList(key) ?? ['no Card'];
     return expiryDateList;
@@ -45,8 +49,7 @@ class _CheckoutPaymentTypePageState extends State<CheckoutPaymentTypePage> {
 
   static Future<List<String>> _getCardHolderNames() async {
     var key =
-        ((global.base_url == 'https://presstofoods.com/dev/') ? 'SAP' : 'TGU') +
-            '_cardHolderName';
+        'cardHolderName';
     final prefs = await SharedPreferences.getInstance();
     final cardHolderNameList = prefs.getStringList(key) ?? ['no Card'];
     return cardHolderNameList;
@@ -54,8 +57,7 @@ class _CheckoutPaymentTypePageState extends State<CheckoutPaymentTypePage> {
 
   static Future<List<String>> _getCVVCodes() async {
     var key =
-        ((global.base_url == 'https://presstofoods.com/dev/') ? 'SAP' : 'TGU') +
-            '_cvvCode';
+        'cvvCode';
     final prefs = await SharedPreferences.getInstance();
     final cvvCodeList = prefs.getStringList(key) ?? ['no Card'];
     return cvvCodeList;
@@ -202,13 +204,15 @@ class _CheckoutPaymentTypePageState extends State<CheckoutPaymentTypePage> {
                                       listCardNumber[index]
                                       ? Icon(Icons.check)
                                       : null),
-                                  onTap: () {
+                                  onTap: widget.isCheckout
+                                  ? () {
                                     CheckoutSession.getInstance.paymentCard = listCardNumber[index];
                                     CheckoutSession.getInstance.paymentExpiryDate = listExpiryDate[index];
                                     CheckoutSession.getInstance.paymentCVVCode = listCVVCode[index];
                                     CheckoutSession.getInstance.paymentCardHolderName = listCardHolderName[index];
                                     Navigator.pop(context);
-                                  },
+                                  }
+                                  : () {},
                                 );
                               }
                             },
@@ -224,7 +228,9 @@ class _CheckoutPaymentTypePageState extends State<CheckoutPaymentTypePage> {
                             onPressed: () {
                               Navigator.push (
                                 context,
-                                MaterialPageRoute(builder: (context) => CreditCardInputPage()),
+                                MaterialPageRoute(builder: (context) => CreditCardInputPage(
+                                  isCheckout: widget.isCheckout,
+                                )),
                               );
                             },
                             child: Text('Add another Card',
