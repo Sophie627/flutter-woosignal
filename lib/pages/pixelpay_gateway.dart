@@ -222,6 +222,12 @@ class _PixelPayGatewayPageState extends State<PixelPayGatewayPage> {
   alertAction(type) async {
     if (type == AlertType.success) {
 
+      setState(() {
+        isLoading = true;
+      });
+
+      Navigator.pop(context);
+
       OrderWC orderWC = await buildOrderWC(taxRate: _taxRate, markPaid: true);
       Order order = await appWooSignal((api) => api.createOrder(orderWC));
 
