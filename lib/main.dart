@@ -20,6 +20,7 @@ import 'package:label_storemax/pages/account_shipping_details.dart';
 import 'package:label_storemax/pages/ciudad.dart';
 import 'package:label_storemax/pages/error_page.dart';
 import 'package:label_storemax/pages/product_image_viewer_page.dart';
+import 'package:label_storemax/pages/splash.dart';
 import 'package:woosignal/models/response/order.dart';
 import 'package:woosignal/models/response/product_category.dart';
 import 'package:woosignal/models/response/products.dart';
@@ -60,7 +61,7 @@ void main() async {
   //IGUAL Q LA DE LOGUEO LO LLEVARA A PAGINA DE PRODUCTOS Q LUEGO SE CAMBIARÁ POR LA DE CATEGORIAS.
 
   //OJO REVISAR SI SE PUEDE CONTROLAR ESO DE LAS CATEGORIAS, CREO QUE SE OCUPARÁ EL JSON DE CATEGORIAS
-  String initialRoute = "/ciudad";
+  String initialRoute = "/splash";
   //String initialRoute = "/browse-category";
 
   runApp(
@@ -70,6 +71,7 @@ void main() async {
       debugShowCheckedModeBanner: false,
       initialRoute: initialRoute,
       routes: <String, WidgetBuilder>{
+        '/splash': (BuildContext context) => new SplashPage(),
         '/ciudad': (BuildContext context) => new Ciudad(),
         '/home': (BuildContext context) => new HomePage(),
         '/cart': (BuildContext context) => new CartPage(),
