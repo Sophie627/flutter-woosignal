@@ -62,9 +62,7 @@ class _CheckoutPaymentTypePageState extends State<CheckoutPaymentTypePage> {
   }
 
   static Future<List<String>> _getCardNumbers() async {
-    var key =
-        ((global.base_url == 'https://presstofoods.com/dev/') ? 'SAP' : 'TGU') +
-            '_cardNumber';
+    var key = 'cardNumber';
     final prefs = await SharedPreferences.getInstance();
     final cardNumberList = prefs.getStringList(key) ?? ['no Card'];
     return cardNumberList;

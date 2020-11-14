@@ -88,9 +88,7 @@ class CreditCardInputPageState extends State<CreditCardInputPage> {
   }
 
   static Future<List<String>> _getCardNumbers() async {
-    var key =
-        ((global.base_url == 'https://presstofoods.com/dev/') ? 'SAP' : 'TGU') +
-            '_cardNumber';
+    var key = 'cardNumber';
     final prefs = await SharedPreferences.getInstance();
     final cardNumberList = prefs.getStringList(key) ?? ['no Card'];
     return cardNumberList;
@@ -100,9 +98,7 @@ class CreditCardInputPageState extends State<CreditCardInputPage> {
     final prefs = await SharedPreferences.getInstance();
     List<String> listCardNumber = [];
 
-    var key_cardNumber =
-        ((global.base_url == 'https://presstofoods.com/dev/') ? 'SAP' : 'TGU') +
-            '_cardNumber';
+    var key_cardNumber = 'cardNumber';
 
     _getCardNumbers().then((value) async {
       if (value[0] == 'no Card') {
