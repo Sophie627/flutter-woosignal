@@ -12,14 +12,14 @@ class _SplashPageState extends State<SplashPage> {
   @override
   Widget build(BuildContext context) {
     return new SplashScreen(
-        seconds: 14,
+        seconds: 5,
         navigateAfterSeconds: new Ciudad(),
-        title: new Text('Welcome In SplashScreen',
-          style: new TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 20.0
-          ),),
-        image: new Image.network('https://i.imgur.com/TyCSG9A.png'),
+//        title: new Text('Welcome In SplashScreen',
+//          style: new TextStyle(
+//              fontWeight: FontWeight.bold,
+//              fontSize: 20.0
+//          ),),
+        image: new Image.asset('assets/images/splash.gif'),
         backgroundColor: Colors.white,
         styleTextUnderTheLoader: new TextStyle(),
         photoSize: 100.0,
