@@ -12,8 +12,8 @@ import 'package:flutter/material.dart';
 import 'package:label_storemax/helpers/shared_pref/sp_auth.dart';
 import 'package:label_storemax/labelconfig.dart';
 import 'package:label_storemax/pages/address.dart';
+import 'package:label_storemax/pages/checkout_details.dart';
 import 'package:label_storemax/pages/checkout_payment_type.dart';
-import 'package:label_storemax/pages/creditcard.dart';
 import 'package:label_storemax/widgets/menu_item.dart';
 import 'package:label_storemax/helpers/tools.dart';
 import 'package:wp_json_api/wp_json_api.dart';
@@ -132,7 +132,11 @@ class _HomeMenuPageState extends State<HomeMenuPage> {
 
   void _actionAddress() {
     Navigator.push(
-        context, MaterialPageRoute(builder: (context) => AddressPage()));
+        context, MaterialPageRoute(builder: (context) => CheckoutDetailsPage(
+          isCheckout: false,
+        )));
+    // Navigator.push(
+    //     context, MaterialPageRoute(builder: (context) => AddressPage()));
   }
 
   void _actionProfile() async {

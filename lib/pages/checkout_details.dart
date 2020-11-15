@@ -24,7 +24,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'global.dart' as global;
 
 class CheckoutDetailsPage extends StatefulWidget {
-  CheckoutDetailsPage();
+
+  final bool isCheckout;
+
+  CheckoutDetailsPage({
+    this.isCheckout = true,
+  });
 
   @override
   _CheckoutDetailsPageState createState() => _CheckoutDetailsPageState();
