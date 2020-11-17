@@ -42,7 +42,7 @@ const app_privacy_url = "https://yourdomain.com/privacy";
 
 const app_currency_symbol = "\L";
 const app_currency_iso = "hnl";
-const Locale app_locale = Locale('en');
+const Locale app_locale = Locale('es');
 // const Locale app_locale = Locale('es');
 const List<Locale> app_locales_supported = [
   Locale('en'),
