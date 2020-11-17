@@ -24,6 +24,8 @@ import 'package:wp_json_api/exceptions/user_already_exist_exception.dart';
 import 'package:wp_json_api/exceptions/username_taken_exception.dart';
 import 'package:wp_json_api/models/responses/wp_user_register_response.dart';
 import 'package:wp_json_api/wp_json_api.dart';
+import 'global.dart' as global;
+import 'package:http/http.dart' as http;
 
 class AccountRegistrationPage extends StatefulWidget {
   AccountRegistrationPage();
@@ -38,6 +40,7 @@ class _AccountRegistrationPageState extends State<AccountRegistrationPage> {
 
   bool _hasTappedRegister;
   TextEditingController _tfEmailAddressController;
+  TextEditingController _tfPhoneController;
   TextEditingController _tfPasswordController;
   TextEditingController _tfFirstNameController;
   TextEditingController _tfLastNameController;
@@ -48,6 +51,7 @@ class _AccountRegistrationPageState extends State<AccountRegistrationPage> {
 
     _hasTappedRegister = false;
     _tfEmailAddressController = TextEditingController();
+    _tfPhoneController = TextEditingController();
     _tfPasswordController = TextEditingController();
     _tfFirstNameController = TextEditingController();
     _tfLastNameController = TextEditingController();
@@ -103,6 +107,13 @@ class _AccountRegistrationPageState extends State<AccountRegistrationPage> {
               controller: _tfEmailAddressController,
               shouldAutoFocus: false,
               keyboardType: TextInputType.emailAddress,
+            ),
+            wsTextEditingRow(
+              context,
+              heading: "Phone Number",
+              controller: _tfPhoneController,
+              shouldAutoFocus: false,
+              keyboardType: TextInputType.phone,
             ),
             wsTextEditingRow(
               context,
@@ -238,6 +249,11 @@ class _AccountRegistrationPageState extends State<AccountRegistrationPage> {
         String token = wpUserRegisterResponse.data.userToken;
         authUser(token);
         storeUserId(wpUserRegisterResponse.data.userId.toString());
+
+        var url = global.base_url + 'wp-json/api/flutter/save_billing_phone?user_id=' + wpUserRegisterResponse.data.userId.toString() + '&phone_number=' + _tfPhoneController.text;
+        print('url');
+        print(url);
+        await http.get(url);
 
         await WPJsonAPI.instance.api((request) => request
             .wpUpdateUserInfo(token, firstName: firstName, lastName: lastName));
