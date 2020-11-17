@@ -50,6 +50,8 @@ class _HomePageState extends State<HomePage> {
     _isLoading = true;
     _categoriesToShow = [];
     _home();
+
+    print("categories ${_categoriesToShow}");
   }
 
   _home() async {
@@ -63,7 +65,7 @@ class _HomePageState extends State<HomePage> {
   _saveSession() async {
     final prefs = await SharedPreferences.getInstance();
     var value =
-        (global.base_url == 'https://presstofoods.com/dev/') ? 'SAP' : 'TGU';
+        (global.base_url == 'https://presstofoods.com/') ? 'SAP' : 'TGU';
     print('LastCity: $value');
     prefs.setString('lastCity', value);
   }
@@ -78,10 +80,10 @@ class _HomePageState extends State<HomePage> {
       _categories = jsonResponse[0];
       print(_categories.length);
       var parentID = 0;
-      if (global.base_url == 'https://presstofoods.com/dev/') {
-        parentID = 216;
+      if (global.base_url == 'https://presstofoods.com/') {
+        parentID = 239;
       } else {
-        parentID = 213;
+        parentID = 236;
       }
       _categories.forEach((category) {
         if (category['parent'] == parentID) {
@@ -156,7 +158,7 @@ class _HomePageState extends State<HomePage> {
             children: <Widget>[
               Center(
                 child: Text(
-                  ((global.base_url == 'https://presstofoods.com/dev/')
+                  ((global.base_url == 'https://presstofoods.com/')
                       ? 'SAN PEDRO SULA'
                       : 'TEGUCIGALPA'),
                   style: TextStyle(

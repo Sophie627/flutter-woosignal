@@ -94,11 +94,11 @@ const app_stripe_live_mode = false;
 //FALTARÍA VER SI MANDA PUSH, O ES MANUAL A CADA USUARIO, Y LISTO.
 const use_wp_login = true;
 
-String app_base_url = (global.base_url == 'https://presstofoods.com/dev/tgu')
-    ? "https://presstofoods.com/dev/tgu"
+String app_base_url = (global.base_url == 'https://presstofoods.com/tgu')
+    ? "https://presstofoods.com/tgu"
     : "https://presstofoods.com/dev"; // change to your url
 const app_forgot_password_url =
-    "https://presstofoods.com/dev/wp-login.php?action=lostpassword"; // change to your forgot password url
+    "https://presstofoods.com/wp-login.php?action=lostpassword"; // change to your forgot password url
 const app_wp_api_path = "/wp-json"; // By default "/wp-json" should work
 
 /*<! ------ Razor Pay (OPTIONAL) ------!>*/

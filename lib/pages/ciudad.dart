@@ -38,7 +38,7 @@ class _CiudadState extends State<Ciudad> {
       }
       switch (value) {
         case 'SAP':
-          global.base_url = "https://presstofoods.com/dev/";
+          global.base_url = "https://presstofoods.com/";
           app_key =
               "app_961e365f250f092f7f5769d6c3b9fb027b2b1bac9fb9d65549f823541ab6";
           _navigate('SAP_loggedIn');
@@ -46,7 +46,7 @@ class _CiudadState extends State<Ciudad> {
           break;
 
         case 'TGU':
-          global.base_url = "https://presstofoods.com/dev/tgu/";
+          global.base_url = "https://presstofoods.com/tgu/";
           app_key =
               "app_ac307452d5ab50f5129996fb23563db6b14055521f5e0a2c8bb6b0b8669a";
 
@@ -102,7 +102,7 @@ class _CiudadState extends State<Ciudad> {
               color: Colors.grey[800],
               textColor: Colors.white,
               onPressed: () {
-                global.base_url = 'https://presstofoods.com/dev/';
+                global.base_url = 'https://presstofoods.com/';
                 if (use_wp_login == true) {
                   WPJsonAPI.instance.initWith(
                       baseUrl: app_base_url,
@@ -126,7 +126,7 @@ class _CiudadState extends State<Ciudad> {
               color: Colors.grey[800],
               textColor: Colors.white,
               onPressed: () {
-                global.base_url = 'https://presstofoods.com/dev/tgu/';
+                global.base_url = 'https://presstofoods.com/tgu/';
                 if (use_wp_login == true) {
                   WPJsonAPI.instance.initWith(
                       baseUrl: app_base_url,

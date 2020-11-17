@@ -92,7 +92,7 @@ class _HomeMenuPageState extends State<HomeMenuPage> {
                   ),
                   wsMenuItem(
                     context,
-                    title: (global.base_url == "https://presstofoods.com/dev/")
+                    title: (global.base_url == "https://presstofoods.com/")
                         ? "SAP, Cambiar ciudad a: TGU"
                         : "TGU, Cambiar ciudad a: SAP",
                     leading: Icon(Icons.compare_arrows),
@@ -149,10 +149,10 @@ class _HomeMenuPageState extends State<HomeMenuPage> {
   }
 
   void _changeCity() {
-    global.base_url = (global.base_url == 'https://presstofoods.com/dev/')
-        ? 'https://presstofoods.com/dev/tgu/'
-        : 'https://presstofoods.com/dev/';
-    var key = (global.base_url == 'https://presstofoods.com/dev/')
+    global.base_url = (global.base_url == 'https://presstofoods.com/')
+        ? 'https://presstofoods.com/tgu/'
+        : 'https://presstofoods.com/';
+    var key = (global.base_url == 'https://presstofoods.com/')
         ? 'SAP_loggedIn'
         : 'TGU_loggedIn';
     app_key = (key == 'SAP_loggedIn')

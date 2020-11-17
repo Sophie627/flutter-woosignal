@@ -111,7 +111,7 @@ class _CheckoutDetailsPageState extends State<CheckoutDetailsPage> {
                 ),
                 Center(
                   child: Text(
-                    ((global.base_url == 'https://presstofoods.com/dev/')
+                    ((global.base_url == 'https://presstofoods.com/')
                         ? 'SAN PEDRO SULA'
                         : 'TEGUCIGALPA'),
                     style: TextStyle(fontSize: 17.0),
@@ -206,7 +206,7 @@ class _CheckoutDetailsPageState extends State<CheckoutDetailsPage> {
                 ),
                 Center(
                   child: Text(
-                    ((global.base_url == 'https://presstofoods.com/dev/')
+                    ((global.base_url == 'https://presstofoods.com/')
                         ? 'SAN PEDRO SULA'
                         : 'TEGUCIGALPA'),
                     style: TextStyle(fontSize: 17.0),
@@ -695,7 +695,7 @@ class _CheckoutDetailsPageState extends State<CheckoutDetailsPage> {
     print(index);
     final prefs = await SharedPreferences.getInstance();
     var key =
-        ((global.base_url == 'https://presstofoods.com/dev/') ? 'SAP' : 'TGU') +
+        ((global.base_url == 'https://presstofoods.com/') ? 'SAP' : 'TGU') +
             '_address';
     addresses.removeAt(index);
     var value = jsonEncode(addresses);
@@ -712,7 +712,7 @@ class _CheckoutDetailsPageState extends State<CheckoutDetailsPage> {
     List<String> listShippingAddress = [];
 
     var key =
-        ((global.base_url == 'https://presstofoods.com/dev/') ? 'SAP' : 'TGU') +
+        ((global.base_url == 'https://presstofoods.com/') ? 'SAP' : 'TGU') +
             '_address';
     _getAddresses().then((value) async {
       print('Address: ${value}');
@@ -731,7 +731,7 @@ class _CheckoutDetailsPageState extends State<CheckoutDetailsPage> {
 
   static Future<List<String>> _getAddresses() async {
     var key =
-        ((global.base_url == 'https://presstofoods.com/dev/') ? 'SAP' : 'TGU') +
+        ((global.base_url == 'https://presstofoods.com/') ? 'SAP' : 'TGU') +
             '_address';
     final prefs = await SharedPreferences.getInstance();
     final addressList = prefs.getStringList(key) ?? ['no Address'];
@@ -744,7 +744,7 @@ class _CheckoutDetailsPageState extends State<CheckoutDetailsPage> {
     customerBillingAddress.lastName = _txtBillingLastName.text;
     customerBillingAddress.addressLine = _txtBillingAddressLine.text;
     customerBillingAddress.city =
-        ((global.base_url == 'https://presstofoods.com/dev/')
+        ((global.base_url == 'https://presstofoods.com/')
             ? 'SAN PEDRO SULA'
             : 'TEGUCIGALPA');
     customerBillingAddress.postalCode = "000000";
@@ -769,7 +769,7 @@ class _CheckoutDetailsPageState extends State<CheckoutDetailsPage> {
       customerShippingAddress.addressLine = _txtShippingAddressLine.text;
       newAddress = _txtShippingAddressLine.text;
       customerShippingAddress.city =
-          ((global.base_url == 'https://presstofoods.com/dev/')
+          ((global.base_url == 'https://presstofoods.com/')
               ? 'SAN PEDRO SULA'
               : 'TEGUCIGALPA');
       customerShippingAddress.postalCode = "000000";

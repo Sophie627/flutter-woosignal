@@ -48,9 +48,9 @@ class _AccountLandingPageState extends State<AccountLandingPage> {
   }
 
   _backAction() {
-    global.base_url = (global.base_url == 'https://presstofoods.com/dev/')
-        ? 'https://presstofoods.com/dev/tgu/'
-        : 'https://presstofoods.com/dev/';
+    global.base_url = (global.base_url == 'https://presstofoods.com/')
+        ? 'https://presstofoods.com/tgu/'
+        : 'https://presstofoods.com/';
     Navigator.pop(context);
   }
 
@@ -71,7 +71,7 @@ class _AccountLandingPageState extends State<AccountLandingPage> {
                 children: <Widget>[
                   storeLogo(height: 100),
                   Text(
-                    ((global.base_url == 'https://presstofoods.com/dev/')
+                    ((global.base_url == 'https://presstofoods.com/')
                         ? 'SAN PEDRO SULA'
                         : 'TEGUCIGALPA'),
                     style: TextStyle(fontSize: 20.0),
@@ -253,7 +253,7 @@ class _AccountLandingPageState extends State<AccountLandingPage> {
   _saveSession() async {
     final prefs = await SharedPreferences.getInstance();
     var key =
-        (global.base_url == 'https://presstofoods.com/dev/') ? 'SAP' : 'TGU';
+        (global.base_url == 'https://presstofoods.com/') ? 'SAP' : 'TGU';
     print('key: $key');
     prefs.setBool(key + '_loggedIn', true);
     prefs.setString(key + '_email', _tfEmailController.text);
