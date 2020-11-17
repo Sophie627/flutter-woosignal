@@ -81,9 +81,9 @@ class _HomePageState extends State<HomePage> {
       print(_categories.length);
       var parentID = 0;
       if (global.base_url == 'https://presstofoods.com/') {
-        parentID = 239;
+        parentID = 238;
       } else {
-        parentID = 236;
+        parentID = 235;
       }
       _categories.forEach((category) {
         if (category['parent'] == parentID) {
@@ -309,8 +309,8 @@ class _HomePageState extends State<HomePage> {
       ),
       floatingActionButton: (_isLoading
           ? (Container())
-          : ((_categoriesToShow[0]['parent'] == 216 ||
-                  _categoriesToShow[0]['parent'] == 213)
+          : ((_categoriesToShow[0]['parent'] == 238 ||
+                  _categoriesToShow[0]['parent'] == 235)
               ? (Container())
               : (FloatingActionButton(
                   onPressed: () {

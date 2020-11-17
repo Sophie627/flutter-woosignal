@@ -257,7 +257,8 @@ class _CheckoutDetailsPageState extends State<CheckoutDetailsPage> {
     BillingDetails billingDetails = CheckoutSession.getInstance.billingDetails;
     String billingAddress = 'Select Billing Address';
 //    print('address: ${billingDetails.billingAddress.addressLine == ''}');
-    if (billingDetails.billingAddress.addressLine != '') billingAddress = billingDetails.billingAddress.addressLine;
+    if (billingDetails != null)
+      if (billingDetails.billingAddress.addressLine != '') billingAddress = billingDetails.billingAddress.addressLine;
 
     return Center(
       child: Container(
@@ -354,34 +355,37 @@ class _CheckoutDetailsPageState extends State<CheckoutDetailsPage> {
     _txtBillingPostalCode = TextEditingController();
     _txtBillingEmailAddress = TextEditingController();
 
-    if (CheckoutSession.getInstance.billingDetails.billingAddress == null) {
-      CheckoutSession.getInstance.billingDetails.initSession();
-      CheckoutSession.getInstance.billingDetails.shippingAddress.initAddress();
-      CheckoutSession.getInstance.billingDetails.billingAddress.initAddress();
+    print('checkout ${CheckoutSession.getInstance.billingDetails}');
+    if (CheckoutSession.getInstance.billingDetails != null) {
+      if (CheckoutSession.getInstance.billingDetails.billingAddress == null) {
+        CheckoutSession.getInstance.billingDetails.initSession();
+        CheckoutSession.getInstance.billingDetails.shippingAddress.initAddress();
+        CheckoutSession.getInstance.billingDetails.billingAddress.initAddress();
+      }
+      BillingDetails billingDetails = CheckoutSession.getInstance.billingDetails;
+      _txtBillingFirstName.text = billingDetails.billingAddress.firstName;
+      _txtBillingLastName.text = billingDetails.billingAddress.lastName;
+      _txtBillingAddressLine.text = billingDetails.billingAddress.addressLine;
+      _txtBillingCity.text = billingDetails.billingAddress.city;
+      _txtBillingPostalCode.text = billingDetails.billingAddress.postalCode;
+      _txtBillingEmailAddress.text = billingDetails.billingAddress.emailAddress;
+      _strBillingCountry = billingDetails.billingAddress.country;
+      _strBillingState = billingDetails.billingAddress.state;
+
+      _txtShippingFirstName.text = billingDetails.shippingAddress.firstName;
+      _txtShippingLastName.text = billingDetails.shippingAddress.lastName;
+      _txtShippingAddressLine.text = billingDetails.shippingAddress.addressLine;
+      _txtShippingCity.text = billingDetails.shippingAddress.city;
+      _txtShippingPostalCode.text = billingDetails.shippingAddress.postalCode;
+      _txtShippingEmailAddress.text = billingDetails.shippingAddress.emailAddress;
+      _strShippingCountry = billingDetails.shippingAddress.country;
+      _strShippingState = billingDetails.shippingAddress.state;
+
+      _valDifferentShippingAddress =
+          CheckoutSession.getInstance.shipToDifferentAddress;
+      valRememberDetails = billingDetails.rememberDetails ?? true;
+      _sfCustomerAddress();
     }
-    BillingDetails billingDetails = CheckoutSession.getInstance.billingDetails;
-    _txtBillingFirstName.text = billingDetails.billingAddress.firstName;
-    _txtBillingLastName.text = billingDetails.billingAddress.lastName;
-    _txtBillingAddressLine.text = billingDetails.billingAddress.addressLine;
-    _txtBillingCity.text = billingDetails.billingAddress.city;
-    _txtBillingPostalCode.text = billingDetails.billingAddress.postalCode;
-    _txtBillingEmailAddress.text = billingDetails.billingAddress.emailAddress;
-    _strBillingCountry = billingDetails.billingAddress.country;
-    _strBillingState = billingDetails.billingAddress.state;
-
-    _txtShippingFirstName.text = billingDetails.shippingAddress.firstName;
-    _txtShippingLastName.text = billingDetails.shippingAddress.lastName;
-    _txtShippingAddressLine.text = billingDetails.shippingAddress.addressLine;
-    _txtShippingCity.text = billingDetails.shippingAddress.city;
-    _txtShippingPostalCode.text = billingDetails.shippingAddress.postalCode;
-    _txtShippingEmailAddress.text = billingDetails.shippingAddress.emailAddress;
-    _strShippingCountry = billingDetails.shippingAddress.country;
-    _strShippingState = billingDetails.shippingAddress.state;
-
-    _valDifferentShippingAddress =
-        CheckoutSession.getInstance.shipToDifferentAddress;
-    valRememberDetails = billingDetails.rememberDetails ?? true;
-    _sfCustomerAddress();
   }
 
   _sfCustomerAddress() async {
