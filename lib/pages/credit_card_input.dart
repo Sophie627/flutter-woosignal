@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_credit_card/credit_card_form.dart';
 import 'package:flutter_credit_card/credit_card_model.dart';
@@ -13,9 +14,19 @@ import 'global.dart' as global;
 class CreditCardInputPage extends StatefulWidget {
 
   final bool isCheckout;
+  final int index;
+  final String cardNumber;
+  final String expiryDate;
+  final String cvvCode;
+  final String cardHolderName;
 
   CreditCardInputPage({Key key,
     this.isCheckout = true,
+    this.index = -1,
+    this.cardHolderName = '',
+    this.expiryDate = '',
+    this.cardNumber = '',
+    this.cvvCode = '',
   }) : super(key: key);
 
   @override
@@ -29,6 +40,18 @@ class CreditCardInputPageState extends State<CreditCardInputPage> {
   String cardHolderName = '';
   String cvvCode = '';
   bool isCvvFocused = false;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    setState(() {
+      cardNumber = widget.cardNumber;
+      expiryDate = widget.expiryDate;
+      cardHolderName = widget.cardHolderName;
+      cvvCode = widget.cvvCode;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,6 +71,10 @@ class CreditCardInputPageState extends State<CreditCardInputPage> {
             Expanded(
               child: SingleChildScrollView(
                 child: CreditCardForm(
+                  cardHolderName: cardHolderName,
+                  cvvCode: cvvCode,
+                  expiryDate: expiryDate,
+                  cardNumber: cardNumber,
                   onCreditCardModelChange: onCreditCardModelChange,
                 ),
               ),
@@ -63,7 +90,7 @@ class CreditCardInputPageState extends State<CreditCardInputPage> {
 //                    MaterialPageRoute(builder: (context) => CreditCardInputPage()),
 //                  );
                 },
-                child: Text('Add Credit Card',
+                child: Text(widget.index == -1 ? 'Add Credit Card' : 'Update Credit Card',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 18.0,
@@ -107,11 +134,20 @@ class CreditCardInputPageState extends State<CreditCardInputPage> {
     var key_cardNumber = 'cardNumber';
 
     _getCardNumbers().then((value) async {
-      if (value[0] == 'no Card') {
-        listCardNumber.add(cardNumber);
+      if (widget.index != -1) {
+        listCardNumber = value;
+        listCardNumber[widget.index] = cardNumber;
         await prefs.setStringList(key_cardNumber, listCardNumber);
         return;
       } else {
+        if (value.length > 0) {
+
+          if (value[0] == 'no Card') {
+            listCardNumber.add(cardNumber);
+            await prefs.setStringList(key_cardNumber, listCardNumber);
+            return;
+          }
+        }
         if (value.indexOf(cardNumber) == -1) {
           value.add(cardNumber);
           listCardNumber = value;
@@ -119,6 +155,7 @@ class CreditCardInputPageState extends State<CreditCardInputPage> {
           return;
         }
       }
+
     });
   }
 
@@ -138,11 +175,20 @@ class CreditCardInputPageState extends State<CreditCardInputPage> {
         'expiryDate';
 
     _getExpiryDates().then((value) async {
-      if (value[0] == 'no Card') {
-        listExpiryDate.add(expiryDate);
+      if (widget.index != -1) {
+        listExpiryDate = value;
+        listExpiryDate[widget.index] = expiryDate;
         await prefs.setStringList(key_expiryDate, listExpiryDate);
         return;
       } else {
+        if (value.length > 0) {
+
+          if (value[0] == 'no Card') {
+            listExpiryDate.add(expiryDate);
+            await prefs.setStringList(key_expiryDate, listExpiryDate);
+            return;
+          }
+        }
         if (value.indexOf(expiryDate) == -1) {
           value.add(expiryDate);
           listExpiryDate = value;
@@ -150,6 +196,7 @@ class CreditCardInputPageState extends State<CreditCardInputPage> {
           return;
         }
       }
+
     });
   }
 
@@ -169,11 +216,20 @@ class CreditCardInputPageState extends State<CreditCardInputPage> {
         'cardHolderName';
 
     _getCardHolderNames().then((value) async {
-      if (value[0] == 'no Card') {
-        listCardHolderName.add(cardHolderName);
+      if (widget.index != -1) {
+        listCardHolderName = value;
+        listCardHolderName[widget.index] = cardHolderName;
         await prefs.setStringList(key_cardHolderName, listCardHolderName);
         return;
       } else {
+        if (value.length > 0) {
+
+          if (value[0] == 'no Card') {
+            listCardHolderName.add(cardHolderName);
+            await prefs.setStringList(key_cardHolderName, listCardHolderName);
+            return;
+          }
+        }
         if (value.indexOf(cardHolderName) == -1) {
           value.add(cardHolderName);
           listCardHolderName = value;
@@ -181,6 +237,7 @@ class CreditCardInputPageState extends State<CreditCardInputPage> {
           return;
         }
       }
+
     });
   }
 
@@ -200,11 +257,20 @@ class CreditCardInputPageState extends State<CreditCardInputPage> {
         'cvvCode';
 
     _getCVVCodes().then((value) async {
-      if (value[0] == 'no Card') {
-        listCVVCodes.add(cvvCode);
+      if (widget.index != -1) {
+        listCVVCodes = value;
+        listCVVCodes[widget.index] = cvvCode;
         await prefs.setStringList(key_cvvCode, listCVVCodes);
         return;
       } else {
+        if (value.length > 0) {
+
+          if (value[0] == 'no Card') {
+            listCVVCodes.add(cvvCode);
+            await prefs.setStringList(key_cvvCode, listCVVCodes);
+            return;
+          }
+        }
         if (value.indexOf(cvvCode) == -1) {
           value.add(cvvCode);
           listCVVCodes = value;
@@ -212,6 +278,7 @@ class CreditCardInputPageState extends State<CreditCardInputPage> {
           return;
         }
       }
+
     });
   }
 

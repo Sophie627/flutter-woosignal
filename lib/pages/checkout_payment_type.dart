@@ -199,11 +199,21 @@ class _CheckoutPaymentTypePageState extends State<CheckoutPaymentTypePage> {
                                           .primaryTextTheme
                                           .subtitle1),
                                   selected: true,
-                                  trailing:
-                                  (CheckoutSession.getInstance.paymentCard ==
-                                      listCardNumber[index]
-                                      ? Icon(Icons.check)
-                                      : null),
+                                  trailing: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      IconButton(
+                                          icon: Icon(Icons.delete, color: Colors.red),
+                                          onPressed: () {
+                                            deleteCard(index);
+                                          }
+                                      ),
+                                      (CheckoutSession.getInstance.paymentCard ==
+                                          listCardNumber[index]
+                                          ? Icon(Icons.check)
+                                          : SizedBox(width: 0,)),
+                                    ],
+                                  ),
                                   onTap: widget.isCheckout
                                   ? () {
                                     CheckoutSession.getInstance.paymentCard = listCardNumber[index];
@@ -212,7 +222,19 @@ class _CheckoutPaymentTypePageState extends State<CheckoutPaymentTypePage> {
                                     CheckoutSession.getInstance.paymentCardHolderName = listCardHolderName[index];
                                     Navigator.pop(context);
                                   }
-                                  : () {},
+                                  : () {
+                                    Navigator.push (
+                                      context,
+                                      MaterialPageRoute(builder: (context) => CreditCardInputPage(
+                                        isCheckout: widget.isCheckout,
+                                        index: index,
+                                        cardNumber: listCardNumber[index],
+                                        expiryDate: listExpiryDate[index],
+                                        cvvCode: listCVVCode[index],
+                                        cardHolderName: listCardHolderName[index],
+                                      )),
+                                    );
+                                  },
                                 );
                               }
                             },
@@ -264,5 +286,19 @@ class _CheckoutPaymentTypePageState extends State<CheckoutPaymentTypePage> {
         ),
       ),
     );
+  }
+
+  Future<void> deleteCard(int index) async {
+    setState(() {
+      listCardHolderName.removeAt(index);
+      listCVVCode.removeAt(index);
+      listExpiryDate.removeAt(index);
+      listCardNumber.removeAt(index);
+    });
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList('cardNumber', listCardNumber);
+    await prefs.setStringList('expiryDate', listExpiryDate);
+    await prefs.setStringList('cvvCode', listCVVCode);
+    await prefs.setStringList('cardHolderName', listCardHolderName);
   }
 }
