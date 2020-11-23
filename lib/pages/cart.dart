@@ -47,6 +47,8 @@ class _CartPageState extends State<CartPage> {
   double _couponAmount = 0;
   String _couponCode = '';
   double _couponTotalPrice = 0;
+  List feeResult = [];
+  bool _isCalculating = true;
 
   @override
   void initState() {
@@ -54,13 +56,27 @@ class _CartPageState extends State<CartPage> {
     _cartLines = [];
     _isLoading = true;
     _cartCheck();
-
   }
 
+  getFee() async {
+    setState(() {
+      _isCalculating = true;
+    });
+    var result = await Cart.getInstance.getCartFees().then((value) {
+      print(value);
+      setState(() {
+        feeResult = value;
+        _isCalculating = false;
+      });
+      print('feeResult $feeResult');
+    });
+  }
   _cartCheck() async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setString('coupon', '0');
     List<CartLineItem> cart = await Cart.getInstance.getCart();
+
+
     if (cart.length <= 0) {
       setState(() {
         _isLoading = false;
@@ -83,6 +99,7 @@ class _CartPageState extends State<CartPage> {
     }
     _cartLines = cartRes.map((json) => CartLineItem.fromJson(json)).toList();
     couponCalculate();
+    getFee();
     if (_cartLines.length > 0) {
       Cart.getInstance.saveCartToPref(cartLineItems: _cartLines);
     }
@@ -148,6 +165,7 @@ class _CartPageState extends State<CartPage> {
     cartLineItem.quantity += 1;
     setState(() {});
     couponCalculate();
+    getFee();
   }
 
   actionDecrementQuantity({CartLineItem cartLineItem}) {
@@ -159,6 +177,8 @@ class _CartPageState extends State<CartPage> {
     cartLineItem.quantity -= 1;
     setState(() {});
     couponCalculate();
+    getFee();
+
   }
 
   actionRemoveItem({int index}) {
@@ -176,6 +196,8 @@ class _CartPageState extends State<CartPage> {
     }
     setState(() {});
     couponCalculate();
+    getFee();
+
   }
 
   void _clearCart() {
@@ -189,6 +211,8 @@ class _CartPageState extends State<CartPage> {
     _isCartEmpty = true;
     setState(() {});
     couponCalculate();
+    getFee();
+
   }
 
   @override
@@ -308,6 +332,16 @@ class _CartPageState extends State<CartPage> {
             ),
             Divider(
               color: Colors.black45,
+            ),
+            _isCalculating
+            ? Center(child: Text('Calculating...'))
+            : Column(
+              children: List.generate(feeResult.length, (index) {
+                return wsRow2Text(context,
+                  text1: feeResult[index]['name'],
+                  text2: '-L ' + (-feeResult[index]['amount']).toStringAsFixed(2),
+                );
+              }),
             ),
             new Padding(
               padding: EdgeInsets.only(bottom: 15, top: 15),
@@ -465,6 +499,8 @@ class _CartPageState extends State<CartPage> {
       });
     }
     couponCalculate();
+    getFee();
+
   }
 
   int getCartQuentity() {

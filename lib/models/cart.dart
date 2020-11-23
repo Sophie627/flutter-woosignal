@@ -17,6 +17,8 @@ import 'package:label_storemax/models/shipping_type.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:woosignal/models/response/shipping_method.dart';
 import 'package:woosignal/models/response/tax_rate.dart';
+import '../pages/global.dart' as global;
+import 'package:http/http.dart' as http;
 
 import '../helpers/tools.dart';
 
@@ -25,6 +27,31 @@ class Cart {
 
   Cart._privateConstructor();
   static final Cart getInstance = Cart._privateConstructor();
+
+  Future getCartFees() async {
+    String productIDs = '';
+    String productQuantity = '';
+    List<CartLineItem> cartLineItems = [];
+    SharedPref sharedPref = SharedPref();
+    String currentCartArrJSON = (await sharedPref.read(_keyCart) as String);
+    if (currentCartArrJSON == null) {
+      cartLineItems = List<CartLineItem>();
+    } else {
+      cartLineItems = (jsonDecode(currentCartArrJSON) as List<dynamic>)
+          .map((i) => CartLineItem.fromJson(i))
+          .toList();
+    }
+    cartLineItems.forEach((element) {
+      productIDs += element.productId.toString() + ',';
+      productQuantity += element.quantity.toString() + ',';
+    });
+
+    var url = global.base_url + 'wp-json/api/flutter/get_discount?product_id=${productIDs}&product_quantity=${productQuantity}';
+    print('url');
+    print(url);
+    var response = await http.get(url);
+    return jsonDecode(response.body);
+  }
 
   Future<List<CartLineItem>> getCart() async {
     List<CartLineItem> cartLineItems = [];

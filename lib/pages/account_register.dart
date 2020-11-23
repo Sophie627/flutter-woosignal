@@ -246,6 +246,14 @@ class _AccountRegistrationPageState extends State<AccountRegistrationPage> {
 
       if (wpUserRegisterResponse != null &&
           wpUserRegisterResponse.status == 200) {
+        Navigator.of(context).pushNamed(UserAuth.instance.redirect);
+
+        showEdgeAlertWith(context,
+            title: trans(context, "Hello") + " $firstName",
+            desc: trans(context, "you're now logged in"),
+            style: EdgeAlertStyle.SUCCESS,
+            icon: Icons.account_circle);
+
         String token = wpUserRegisterResponse.data.userToken;
         authUser(token);
         storeUserId(wpUserRegisterResponse.data.userId.toString());
@@ -258,13 +266,10 @@ class _AccountRegistrationPageState extends State<AccountRegistrationPage> {
         await WPJsonAPI.instance.api((request) => request
             .wpUpdateUserInfo(token, firstName: firstName, lastName: lastName));
 
-        showEdgeAlertWith(context,
-            title: trans(context, "Hello") + " $firstName",
-            desc: trans(context, "you're now logged in"),
-            style: EdgeAlertStyle.SUCCESS,
-            icon: Icons.account_circle);
-        navigatorPush(context,
-            routeName: UserAuth.instance.redirect, forgetLast: 2);
+
+
+//        navigatorPush(context,
+//            routeName: UserAuth.instance.redirect, forgetLast: 2);
       }
     }
   }
