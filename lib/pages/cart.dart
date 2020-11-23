@@ -60,12 +60,14 @@ class _CartPageState extends State<CartPage> {
   }
 
   getFee() async {
+    print("ok");
     setState(() {
       _isCalculating = true;
     });
     await Cart.getInstance.getCartFees().then((value) async {
       print(value);
       setState(() {
+        discount = 0;
         feeResult = value;
         _isCalculating = false;
       });
@@ -89,6 +91,7 @@ class _CartPageState extends State<CartPage> {
       setState(() {
         _isLoading = false;
         _isCartEmpty = (cart.length <= 0) ? true : false;
+        _isCalculating = false;
       });
       return [];
     }
@@ -156,7 +159,7 @@ class _CartPageState extends State<CartPage> {
     Navigator.pushNamed(context, "/checkout");
   }
 
-  actionIncrementQuantity({CartLineItem cartLineItem}) {
+  actionIncrementQuantity({CartLineItem cartLineItem}) async {
     if (cartLineItem.isManagedStock &&
         cartLineItem.quantity + 1 > cartLineItem.stockQuantity) {
       showEdgeAlertWith(
@@ -168,7 +171,7 @@ class _CartPageState extends State<CartPage> {
       );
       return;
     }
-    Cart.getInstance
+    await Cart.getInstance
         .updateQuantity(cartLineItem: cartLineItem, incrementQuantity: 1);
     cartLineItem.quantity += 1;
     setState(() {});
@@ -176,11 +179,11 @@ class _CartPageState extends State<CartPage> {
     getFee();
   }
 
-  actionDecrementQuantity({CartLineItem cartLineItem}) {
+  actionDecrementQuantity({CartLineItem cartLineItem}) async {
     if (cartLineItem.quantity - 1 <= 0) {
       return;
     }
-    Cart.getInstance
+    await Cart.getInstance
         .updateQuantity(cartLineItem: cartLineItem, incrementQuantity: -1);
     cartLineItem.quantity -= 1;
     setState(() {});
@@ -189,8 +192,8 @@ class _CartPageState extends State<CartPage> {
 
   }
 
-  actionRemoveItem({int index}) {
-    Cart.getInstance.removeCartItemForIndex(index: index);
+  actionRemoveItem({int index}) async {
+    await Cart.getInstance.removeCartItemForIndex(index: index);
     _cartLines.removeAt(index);
     showEdgeAlertWith(
       context,
@@ -208,8 +211,8 @@ class _CartPageState extends State<CartPage> {
 
   }
 
-  void _clearCart() {
-    Cart.getInstance.clear();
+  void _clearCart() async {
+    await Cart.getInstance.clear();
     _cartLines = [];
     showEdgeAlertWith(context,
         title: trans(context, "Success"),
