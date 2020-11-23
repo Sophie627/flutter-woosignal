@@ -99,6 +99,8 @@ class Cart {
       total += (parseWcPrice(cartItem.total) * cartItem.quantity);
     });
     total -= double.parse(prefs.getString('coupon'));
+    total += double.parse(prefs.getString('discount'));
+
     if (withFormat != null && withFormat == true) {
       return formatDoubleCurrency(total: total);
     }
@@ -114,6 +116,7 @@ class Cart {
       subtotal += (parseWcPrice(cartItem.subtotal) * cartItem.quantity);
     });
     subtotal -= double.parse(prefs.getString('coupon'));
+    subtotal += double.parse(prefs.getString('discount'));
     if (withFormat != null && withFormat == true) {
       return formatDoubleCurrency(total: subtotal);
     }

@@ -49,6 +49,7 @@ class _CartPageState extends State<CartPage> {
   double _couponTotalPrice = 0;
   List feeResult = [];
   bool _isCalculating = true;
+  double discount = 0;
 
   @override
   void initState() {
@@ -62,12 +63,19 @@ class _CartPageState extends State<CartPage> {
     setState(() {
       _isCalculating = true;
     });
-    var result = await Cart.getInstance.getCartFees().then((value) {
+    await Cart.getInstance.getCartFees().then((value) async {
       print(value);
       setState(() {
         feeResult = value;
         _isCalculating = false;
       });
+      feeResult.forEach((element) {
+        setState(() {
+          discount += element['amount'];
+        });
+      });
+      final prefs = await SharedPreferences.getInstance();
+      prefs.setString('discount', discount.toString());
       print('feeResult $feeResult');
     });
   }
@@ -334,22 +342,29 @@ class _CartPageState extends State<CartPage> {
               color: Colors.black45,
             ),
             _isCalculating
-            ? Center(child: Text('Calculating...'))
+            ? Padding(
+              padding: EdgeInsets.only(bottom: 15, top: 15),
+              child: Center(child: Text('Calculating...')),
+            )
             : Column(
-              children: List.generate(feeResult.length, (index) {
-                return wsRow2Text(context,
-                  text1: feeResult[index]['name'],
-                  text2: '-L ' + (-feeResult[index]['amount']).toStringAsFixed(2),
-                );
+              children: List.generate(feeResult.length + 1, (index) {
+                if (index < feeResult.length) {
+                  return wsRow2Text(context,
+                    text1: feeResult[index]['name'],
+                    text2: '-L ' + (-feeResult[index]['amount']).toStringAsFixed(2),
+                  );
+                } else {
+                  return new Padding(
+                    padding: EdgeInsets.only(bottom: 15, top: 15),
+                    child: wsRow2Text(context,
+                      text1: trans(context, "Total"),
+                      text2: 'L ' + (_couponTotalPrice + discount).toStringAsFixed(2),
+                    ),
+                  );
+                }
               }),
             ),
-            new Padding(
-              padding: EdgeInsets.only(bottom: 15, top: 15),
-              child: wsRow2Text(context,
-                text1: trans(context, "Total"),
-                text2: 'L ' + _couponTotalPrice.toStringAsFixed(2),
-              ),
-            ),
+
 //            FutureBuilder<String>(
 //              future: Cart.getInstance.getTotal(withFormat: true),
 //              builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
